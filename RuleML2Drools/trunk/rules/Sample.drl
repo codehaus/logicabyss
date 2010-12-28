@@ -1,0 +1,28 @@
+package com.sample
+ 
+import com.sample.DroolsTest.*;
+ 
+rule "buy&Keep"
+	when
+		b:Buy($p:person,$o:object)
+		Keep(person == $p, object == $o)
+	then
+		System.out.println("Buys and keeps: "+ $p + ", " +$o  );
+		insert (new Own ($p,$o));
+end 
+
+rule "sells"
+	when
+		Sell($m:merchant,$p:person,$o:object)
+	then
+		System.out.println("Sells: "+ $p + ", " +$o  );
+		insert (new Buy($p,$m,$o));
+end 
+
+rule "owns"
+	when
+		Own ($p:person, $o:object)
+	then
+		System.out.println("Owns : " + $p + ", " +$o );
+end
+
