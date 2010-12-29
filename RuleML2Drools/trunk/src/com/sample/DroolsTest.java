@@ -41,7 +41,7 @@ public class DroolsTest {
 			ksession.fireAllRules();
 
 			Rule rule1 = (Rule) kbase.getRule("com.sample", "buy&Keep");
-			RuleML2DroolsTranslator.testTransform(rule1);
+			Drools2RuleMLTranslator.testTransform(rule1);
 
 			// Rule rule2 = kbase.getRule("com.sample", "sells");
 
