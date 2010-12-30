@@ -9,6 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
 import org.drools.base.ClassFieldReader;
 import org.drools.rule.Declaration;
 import org.drools.rule.GroupElement;
@@ -17,6 +21,17 @@ import org.drools.rule.Pattern;
 import org.drools.rule.Rule;
 import org.drools.rule.VariableConstraint;
 import org.drools.spi.ObjectType;
+
+import datalog.AndInnerType;
+import datalog.AssertType;
+import datalog.AtomType;
+import datalog.IfType;
+import datalog.ImpliesType;
+import datalog.ObjectFactory;
+import datalog.OpAtomType;
+import datalog.RelType;
+import datalog.RuleMLType;
+import datalog.VarType;
 
 public class Drools2RuleMLTranslator {
 
@@ -91,5 +106,93 @@ public class Drools2RuleMLTranslator {
 			}
 		}
 	}
+
+	public static String testTransformToRuleML(Rule rule) throws JAXBException {
+		JAXBContext jContext = JAXBContext.newInstance("datalog");
+		System.out.println("context ok");
+
+		StringBuffer result = new StringBuffer();
+		ObjectFactory factory = new ObjectFactory();
+
+		RuleMLType ruleMLType = factory.createRuleMLType();
+		List<Object> assertOrRetractOrQueryList = ruleMLType
+				.getAssertOrRetractOrQuery();
+
+		AssertType assertType = factory.createAssertType();
+		assertOrRetractOrQueryList.add(assertType);
+
+		List<Object> formulaOrRulebaseOrAtomList = assertType
+				.getFormulaOrRulebaseOrAtom();
+
+		// AND
+		AndInnerType andInnerType = factory.createAndInnerType();
+
+		// atom buy
+		AtomType atomType = factory.createAtomType();
+
+		RelType relType = factory.createRelType();
+		relType.getContent().add("buy");
+
+		OpAtomType opAtomType = factory.createOpAtomType();
+		opAtomType.setRel(relType);
+
+		VarType varType1 = factory.createVarType();
+		varType1.getContent().add("person");
+
+		VarType varType2 = factory.createVarType();
+		varType2.getContent().add("merchant");
+
+		VarType varType3 = factory.createVarType();
+		varType3.getContent().add("object");
+
+		atomType.getContent().add(factory.createOp(opAtomType));
+		atomType.getContent().add(factory.createVar(varType1));
+		atomType.getContent().add(factory.createVar(varType2));
+		atomType.getContent().add(factory.createVar(varType3));
+
+		andInnerType.getFormulaOrAtomOrAnd().add(atomType);
+
+		// atom own
+		atomType = factory.createAtomType();
+
+		relType = factory.createRelType();
+		relType.getContent().add("keep");
+
+		opAtomType = factory.createOpAtomType();
+		opAtomType.setRel(relType);
+
+		varType1 = factory.createVarType();
+		varType1.getContent().add("person");
+
+		varType2 = factory.createVarType();
+		varType2.getContent().add("object");
+
+		atomType.getContent().add(factory.createOp(opAtomType));
+		atomType.getContent().add(factory.createVar(varType1));
+		atomType.getContent().add(factory.createVar(varType2));
+
+		andInnerType.getFormulaOrAtomOrAnd().add(atomType);
+
+		// if
+		IfType ifType = factory.createIfType();
+		ifType.setAnd(andInnerType);
+
+		// implies
+		ImpliesType impliesType = factory.createImpliesType();
+		impliesType.getContent().add(factory.createIf(ifType));
+
+		// add implies to assert
+		formulaOrRulebaseOrAtomList.add(impliesType);
+
+		Marshaller marshaller = jContext.createMarshaller();
+
+		System.out.println("marshaller  ready");
+
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+
+		marshaller.marshal(ruleMLType, System.out);
+
+		return result.toString();
+	}	
 	
 }

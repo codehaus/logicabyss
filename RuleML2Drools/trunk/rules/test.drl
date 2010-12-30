@@ -1,0 +1,10 @@
+package com.sample
+import com.sample.TestDataModel.*;
+rule "buy&Keep"
+when
+	Buy($person:buyer,$merchant:seller,$object:item)
+	Keep(keeper==$person,item==$object)
+then
+	System.out.println ("dsfsdfsd");
+	insert( new Own($person,$object));
+end
