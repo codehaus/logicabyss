@@ -113,9 +113,6 @@ public class RuleML2DroolsTranslator {
 		translator.dispatchType(assertType.getFormulaOrRulebaseOrAtom().get(0));
 
 		System.out.println("end");
-		// for (DlrPattern pattern : translator.dlRPatterns) {
-		// System.out.println(pattern);
-		// }
 
 		// create the object model
 

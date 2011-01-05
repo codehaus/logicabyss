@@ -10,6 +10,7 @@ import org.drools.builder.ResourceType;
 import org.drools.io.ResourceFactory;
 import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
+import org.drools.rule.Rule;
 import org.drools.runtime.StatefulKnowledgeSession;
 
 import com.sample.TestDataModel.Buy;
@@ -42,12 +43,8 @@ public class DroolsTest {
 
 			ksession.fireAllRules();
 
-//			Rule rule1 = (Rule) kbase.getRule("com.sample", "buy&Keep");
-//			Drools2RuleMLTranslator.testTransform(rule1);
-
-			// Rule rule2 = kbase.getRule("com.sample", "sells");
-
-			// testTransformToRuleML(rule1);
+			Rule rule1 = (Rule) kbase.getRule("com.sample", "buy&Keep");
+			Drools2RuleMLTranslator.testTransform(rule1);
 
 			logger.close();
 		} catch (Throwable t) {

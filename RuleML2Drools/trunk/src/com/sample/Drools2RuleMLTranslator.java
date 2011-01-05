@@ -34,6 +34,10 @@ import datalog.RuleMLType;
 import datalog.VarType;
 
 public class Drools2RuleMLTranslator {
+	
+	public static void main(String[] args) {
+		
+	}
 
 	public static void testTransform(Rule rule1) {
 		Map<String, String> bindVars = new HashMap<String, String>();
@@ -85,7 +89,7 @@ public class Drools2RuleMLTranslator {
 							// put the variable with the bound name in the map
 							bindVars.put(declaration.getIdentifier(),
 									o.getFieldName());
-							System.out.printf("Var %1,%2 put in the map",declaration.getIdentifier(),o.getFieldName());
+							System.out.println("Put the var in the map: "+ declaration.getIdentifier()+ " "+o.getFieldName());
 						}
 					} else if (constraint instanceof LiteralConstraint) {
 						LiteralConstraint literalConstraint = (LiteralConstraint) constraint;
