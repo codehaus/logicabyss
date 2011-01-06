@@ -223,8 +223,7 @@
 <!--
 	add Neg so that head's content model is:
 	(Atom | Equal | Neg)
-	<xs:group name="head.content">
-			<xs:group ref="head.content"/>
+		** @jabarski
 -->
 	<xs:group name="then.content">
 		<xs:choice>
@@ -238,8 +237,7 @@
 <!--
 	add Naf, Neg so that body's content model is:
 	(Atom | And | Or | Equal | Naf | Neg)
-	<xs:group name="body.content">
-			<xs:group ref="body.content"/>
+		** @jabarski
 -->
 	<xs:group name="if.content">
 		<xs:choice>
