@@ -373,7 +373,7 @@
 	 so that Neg is allowed below Naf
 
  -->
-<xs:redefine schemaLocation="http://www.ruleml.org/0.91/xsd/modules/naf_module.xsd">
+<xs:redefine schemaLocation="http://www.ruleml.org/1.0/xsd/modules/naf_module.xsd">
 
 		<!--
 			add Neg so that weak's content model is:
@@ -398,7 +398,7 @@
 	 so that Equal is allowed below Neg
 
  -->
-<xs:redefine schemaLocation="http://www.ruleml.org/0.91/xsd/modules/neg_module.xsd">
+<xs:redefine schemaLocation="http://www.ruleml.org/1.0/xsd/modules/neg_module.xsd">
 
 		<!--
 			add Equal so that strong's content model is:
