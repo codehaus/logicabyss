@@ -112,7 +112,6 @@
      
      content model: (  Atom | And | Or | Equal | Naf | Neg | Rule )
 			** @jabarskt **          
-			<xs:group ref="body.content"/> 
 -->
 	<xs:attributeGroup name="if.attlist">
 		<xs:attributeGroup ref="arg.attrib"/>
@@ -137,7 +136,6 @@
      
      content model: (  Atom  | Neg | Equal )
           	** @jabarskt **
-			<xs:group ref="head.content"/> 
 -->
 	<xs:attributeGroup name="then.attlist">
 		<xs:attributeGroup ref="arg.attrib"/>
