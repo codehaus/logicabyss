@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://www.ruleml.org/0.91/xsd" xmlns="http://www.ruleml.org/0.91/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema targetNamespace="http://www.ruleml.org/1.0/xsd" xmlns="http://www.ruleml.org/1.0/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
 	<xs:annotation>
 		<xs:documentation xml:lang="en">
@@ -28,10 +28,10 @@
 		</xs:documentation>
 	</xs:annotation>
 	
-	<xs:include schemaLocation="http://ibis.in.tum.de/research/ReactionRuleML/0.2/modules/algebra_module.xsd"/>
-	<xs:include schemaLocation="http://ibis.in.tum.de/research/ReactionRuleML/0.2/modules/message_module.xsd"/>
+	<xs:include schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/modules/algebra_module.xsd"/>
+	<xs:include schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/modules/message_module.xsd"/>
 
-	<xs:redefine schemaLocation="http://ibis.in.tum.de/research/ReactionRuleML/0.2/pr.xsd">
+	<xs:redefine schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/pr.xsd">
 
 		<!--
 			rr schema redefines RuleML by adding Message

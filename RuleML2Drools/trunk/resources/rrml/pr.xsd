@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://www.ruleml.org/0.91/xsd" xmlns="http://www.ruleml.org/0.91/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+<xs:schema targetNamespace="http://www.ruleml.org/1.0/xsd" xmlns="http://www.ruleml.org/1.0/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
 
 	<xs:annotation>
 		<xs:documentation xml:lang="en">
@@ -36,7 +36,7 @@
 	</xs:annotation>
 
 	   
-	<xs:redefine schemaLocation="http://ibis.in.tum.de/research/ReactionRuleML/0.2/dr.xsd">
+	<xs:redefine schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/dr.xsd">
 
 <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
 
