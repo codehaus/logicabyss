@@ -111,14 +111,15 @@
      *** elseAfter ***
      
      content model: (  Atom | And | Or | Equal | Naf | Neg | Rule )
-          
+			** @jabarskt **          
+			<xs:group ref="body.content"/> 
 -->
 	<xs:attributeGroup name="if.attlist">
 		<xs:attributeGroup ref="arg.attrib"/>
 	</xs:attributeGroup>	
 	<xs:group name="if.content">
 		<xs:choice>
-			<xs:group ref="body.content"/> 
+			<xs:group ref="if.content"/> 
 			<xs:element ref="Rule"/>			
 		</xs:choice>
 	</xs:group>
@@ -135,14 +136,15 @@
      *** else ***
      
      content model: (  Atom  | Neg | Equal )
-          
+          	** @jabarskt **
+			<xs:group ref="head.content"/> 
 -->
 	<xs:attributeGroup name="then.attlist">
 		<xs:attributeGroup ref="arg.attrib"/>
 	</xs:attributeGroup>	
 	<xs:group name="then.content">
 		<xs:choice>
-			<xs:group ref="head.content"/> 
+			<xs:group ref="then.content"/> 
 		</xs:choice>
 	</xs:group>
 	<xs:complexType name="then.type">

@@ -223,10 +223,12 @@
 <!--
 	add Neg so that head's content model is:
 	(Atom | Equal | Neg)
--->
 	<xs:group name="head.content">
-		<xs:choice>
 			<xs:group ref="head.content"/>
+-->
+	<xs:group name="then.content">
+		<xs:choice>
+			<xs:group ref="then.content"/>
 			<xs:element ref="Neg"/>			
 		</xs:choice>
 	</xs:group>
@@ -236,10 +238,12 @@
 <!--
 	add Naf, Neg so that body's content model is:
 	(Atom | And | Or | Equal | Naf | Neg)
--->
 	<xs:group name="body.content">
-		<xs:choice>
 			<xs:group ref="body.content"/>
+-->
+	<xs:group name="if.content">
+		<xs:choice>
+			<xs:group ref="if.content"/>
 			<xs:group ref="naf_neg.content"/>
 		</xs:choice>
 	</xs:group>
@@ -332,7 +336,7 @@
 			Remove @in, to be re-added as @per
 
 --> 
-  <xs:attributeGroup name="in.attrib"/> 
+  <xs:attributeGroup name="per.attrib"/> 
 
 <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
 
