@@ -124,10 +124,11 @@
 <!--
 	add Assert, Retract, Update so that body's content model is:
 	(Atom | And | Or | Equal | Naf | Neg | Assert | Retract | Update)
+		** @jabarski
 -->
-	<xs:group name="body.content">
+	<xs:group name="then.content">
 		<xs:choice>
-			<xs:group ref="body.content"/>			
+			<xs:group ref="then.content"/>			
 			<xs:element ref="Assert"/>
 			<xs:element ref="Retract"/>
 			<xs:element ref="Update"/>
