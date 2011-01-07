@@ -127,9 +127,6 @@
 		<xs:group ref="if.content"/>
 		<xs:attributeGroup ref="if.attlist"/>
 	</xs:complexType>
-<!--	<xs:element name="if" type="if.type"/> -->
-<!--	<xs:element name="after" type="if.type"/> -->
-<!--	<xs:element name="elseAfter" type="if.type"/> -->
 
 <!--
      *** then ***
@@ -150,9 +147,12 @@
 		<xs:group ref="then.content"/>
 		<xs:attributeGroup ref="then.attlist"/>
 	</xs:complexType>
-<!--	<xs:element name="then" type="then.type"/> -->
-<!--	<xs:element name="else" type="then.type"/> -->
 </xs:redefine>
+	<xs:element name="if" type="if.type"/>
+	<xs:element name="after" type="if.type"/>
+	<xs:element name="elseAfter" type="if.type"/>
+	<xs:element name="then" type="then.type"/>
+	<xs:element name="else" type="then.type"/>
 <!--
      *** do ***
      *** elseDo ***
