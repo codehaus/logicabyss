@@ -143,7 +143,7 @@
 	<xs:element name="then" type="then.type"/>
 	<xs:element name="else" type="then.type"/>
 
-<xs:redefine schemaLocation="http://www.ruleml.org/1.0/xsd/modules/connection_module.xsd">
+<xs:redefine schemaLocation="http://www.ruleml.org/1.0/xsd/modules/connective_module.xsd">
 	<xs:group name="if.content">
 		<xs:choice>
 			<xs:group ref="if.content"/> 
