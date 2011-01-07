@@ -113,15 +113,11 @@
      content model: (  Atom | And | Or | Equal | Naf | Neg | Rule )
 			** @jabarski **          
 -->
+
+
 	<xs:attributeGroup name="if.attlist">
 		<xs:attributeGroup ref="arg.attrib"/>
 	</xs:attributeGroup>	
-	<xs:group name="if.content">
-		<xs:choice>
-			<xs:group ref="if.content"/> 
-			<xs:element ref="Rule"/>			
-		</xs:choice>
-	</xs:group>
 	<xs:complexType name="if.type">
 		<xs:group ref="if.content"/>
 		<xs:attributeGroup ref="if.attlist"/>
@@ -140,11 +136,6 @@
 	<xs:attributeGroup name="then.attlist">
 		<xs:attributeGroup ref="arg.attrib"/>
 	</xs:attributeGroup>	
-	<xs:group name="then.content">
-		<xs:choice>
-			<xs:group ref="then.content"/> 
-		</xs:choice>
-	</xs:group>
 	<xs:complexType name="then.type">
 		<xs:group ref="then.content"/>
 		<xs:attributeGroup ref="then.attlist"/>
@@ -152,6 +143,19 @@
 	<xs:element name="then" type="then.type"/>
 	<xs:element name="else" type="then.type"/>
 
+<xs:redefine schemaLocation="http://www.ruleml.org/1.0/xsd/modules/connection_module.xsd">
+	<xs:group name="if.content">
+		<xs:choice>
+			<xs:group ref="if.content"/> 
+			<xs:element ref="Rule"/>			
+		</xs:choice>
+	</xs:group>
+	<xs:group name="then.content">
+		<xs:choice>
+			<xs:group ref="then.content"/> 
+		</xs:choice>
+	</xs:group>
+</xs:redefine>
 <!--
      *** do ***
      *** elseDo ***
