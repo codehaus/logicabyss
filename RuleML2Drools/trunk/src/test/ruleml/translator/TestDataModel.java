@@ -1,4 +1,4 @@
-package com.sample;
+package ruleml.translator;
 
 public class TestDataModel {
 	public static class Keep {

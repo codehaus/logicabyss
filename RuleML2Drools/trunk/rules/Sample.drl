@@ -1,6 +1,6 @@
-package com.sample
+package org.ruleml.translator
  
-import com.sample.TestDataModel.*;
+import ruleml.translator.TestDataModel.*;
  
 rule "buy&Keep"
 	when

@@ -3,7 +3,7 @@ import com.sample.TestDataModel.*;
 rule "buy&Keep"
 when
 	Buy($person:buyer,$merchant:seller,$object:item)
-	Keep(keeper==$person,item==$object)
+	Keep(keeper==$person,item=="test")
 then
 	insert( new Own($person,$object));
 end

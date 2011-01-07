@@ -111,7 +111,7 @@
      *** elseAfter ***
      
      content model: (  Atom | And | Or | Equal | Naf | Neg | Rule )
-			** @jabarskt **          
+			** @jabarski **          
 -->
 	<xs:attributeGroup name="if.attlist">
 		<xs:attributeGroup ref="arg.attrib"/>
@@ -135,7 +135,7 @@
      *** else ***
      
      content model: (  Atom  | Neg | Equal )
-          	** @jabarskt **
+          	** @jabarski **
 -->
 	<xs:attributeGroup name="then.attlist">
 		<xs:attributeGroup ref="arg.attrib"/>
