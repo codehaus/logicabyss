@@ -113,22 +113,22 @@
      content model: (  Atom | And | Or | Equal | Naf | Neg | Rule )
 			** @jabarski **          
 -->
-	<xs:attributeGroup name="if.attlist">
+	<xs:attributeGroup name="if1.attlist">
 		<xs:attributeGroup ref="arg.attrib"/>
 	</xs:attributeGroup>	
-	<xs:group name="if.content">
+	<xs:group name="if1.content">
 		<xs:choice>
-			<xs:group ref="ruleml:if.content"/> 
+			<xs:group ref="if.content"/> 
 			<xs:element ref="Rule"/>			
 		</xs:choice>
 	</xs:group>
-	<xs:complexType name="if.type">
-		<xs:group ref="if.content"/>
-		<xs:attributeGroup ref="if.attlist"/>
+	<xs:complexType name="if1.type">
+		<xs:group ref="if1.content"/>
+		<xs:attributeGroup ref="if1.attlist"/>
 	</xs:complexType>
-	<xs:element name="if" type="if.type"/>
-	<xs:element name="after" type="if.type"/>
-	<xs:element name="elseAfter" type="if.type"/>
+	<xs:element name="if1" type="if1.type"/>
+	<xs:element name="after" type="if1.type"/>
+	<xs:element name="elseAfter" type="if1.type"/>
 
 <!--
      *** then ***
@@ -137,19 +137,19 @@
      content model: (  Atom  | Neg | Equal )
           	** @jabarski **
 -->
-	<xs:attributeGroup name="then.attlist">
+	<xs:attributeGroup name="then1.attlist">
 		<xs:attributeGroup ref="arg.attrib"/>
 	</xs:attributeGroup>	
-	<xs:group name="then.content">
+	<xs:group name="then1.content">
 		<xs:choice>
-			<xs:group ref="ruleml:then.content"/> 
+			<xs:group ref="then.content"/> 
 		</xs:choice>
 	</xs:group>
-	<xs:complexType name="then.type">
-		<xs:group ref="then.content"/>
-		<xs:attributeGroup ref="then.attlist"/>
+	<xs:complexType name="then1.type">
+		<xs:group ref="then1.content"/>
+		<xs:attributeGroup ref="then1.attlist"/>
 	</xs:complexType>
-	<xs:element name="then" type="then.type"/>
+	<xs:element name="then1" type="then1.type"/>
 	<xs:element name="else" type="then.type"/>
 
 <!--
@@ -289,7 +289,7 @@
 		<!-- 
 		  (if, ...)
 		-->  			 
-			 <xs:element ref="if"/>
+			 <xs:element ref="if1"/>
 			 <xs:choice>	
 				 <xs:group ref="DerivationRule.content"/>
 				 <xs:group ref="ProductionRule.content"/>
@@ -321,8 +321,8 @@
 		<xs:sequence>
 			<xs:element ref="on"/>
 			<xs:sequence minOccurs="0">
-				<xs:element ref="if" minOccurs="0"/>
-				<xs:element ref="then" minOccurs="0"/>
+				<xs:element ref="if1" minOccurs="0"/>
+				<xs:element ref="then1" minOccurs="0"/>
 				<xs:element ref="do"/>
 			    <xs:element ref="after" minOccurs="0"/>
 				<xs:element ref="else" minOccurs="0"/>
