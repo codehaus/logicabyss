@@ -75,7 +75,7 @@
 		An attribute indicating whether a function or expression is interpreted.
 		
 	-->
-	<xs:attributeGroup name="per.attrib">
+<!-- 	<xs:attributeGroup name="per.attrib">
 		<xs:attribute name="per" use="optional" default="plain">
 			<xs:simpleType>
 				<xs:restriction base="xs:NMTOKEN">
@@ -87,7 +87,7 @@
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:attributeGroup>
-	
+	-->
 	<!--
 		*** @all ***
 		An attribute indicating whether a function or expression is interpreted.
