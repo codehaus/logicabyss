@@ -43,10 +43,6 @@
 	</xs:annotation>
 
 	   
-	<xs:include schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/modules/root_module.xsd"/>			
-	<xs:include schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/modules/rule_module.xsd"/>
-	<xs:include schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/modules/attribute_module.xsd"/>
-
 
 <xs:redefine schemaLocation="http://www.ruleml.org/1.0/xsd/hornlogeq.xsd">
 
@@ -426,6 +422,9 @@
 			</xs:choice>	
 </xs:group>
 
+<xs:include schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/modules/root_module.xsd"/>			
+	<xs:include schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/modules/rule_module.xsd"/>
+	<xs:include schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/modules/attribute_module.xsd"/>
 
 	
 </xs:schema>
