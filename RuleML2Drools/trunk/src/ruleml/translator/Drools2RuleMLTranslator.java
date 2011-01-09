@@ -5,9 +5,18 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
+
+import naffolog.AssertType;
+import naffolog.AtomType;
+import naffolog.IfType;
+import naffolog.ImpliesType;
+import naffolog.OpAtomType;
+import naffolog.RelType;
+import naffolog.RuleMLType;
 
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -18,76 +27,37 @@ import org.drools.builder.KnowledgeBuilderError;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
+import org.drools.definition.KnowledgePackage;
 import org.drools.io.ResourceFactory;
-import org.drools.logger.KnowledgeRuntimeLogger;
-import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.rule.Declaration;
 import org.drools.rule.GroupElement;
 import org.drools.rule.GroupElement.Type;
 import org.drools.rule.LiteralConstraint;
+import org.drools.rule.OrConstraint;
 import org.drools.rule.Pattern;
 import org.drools.rule.Rule;
 import org.drools.rule.VariableConstraint;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.drools.spi.AlphaNodeFieldConstraint;
 
-import ruleml.translator.TestDataModel.Buy;
-import ruleml.translator.TestDataModel.Keep;
-
-
-import datalog.AndInnerType;
-import datalog.AtomType;
-import datalog.OpAtomType;
-import datalog.OrInnerType;
-import datalog.RelType;
-
+/**
+ * Translator for Drools rules to RuleML
+ * 
+ * @author Jabarski
+ */
 public class Drools2RuleMLTranslator {
 
 	private RuleMLBuilder creator = new RuleMLBuilder();
-	
-	/**
-	 * Main test method
-	 */
-	public static final void main(String[] args) {
-		try {
-			Drools2RuleMLTranslator translator = new Drools2RuleMLTranslator();
-
-			// load up the knowledge base
-			KnowledgeBase kbase = translator.readKnowledgeBase();
-			StatefulKnowledgeSession ksession = kbase
-					.newStatefulKnowledgeSession();
-			KnowledgeRuntimeLogger logger = KnowledgeRuntimeLoggerFactory
-					.newFileLogger(ksession, "test");
-
-			// Sell sell1 = new Sell("Ti6o", "Dealer", "Objective");
-			// Sell sell2 = new Sell("Margo", "Amazon", "USB");
-			Buy buy1 = new Buy("Ti6o", "Dealer", "Objective");
-			Buy buy2 = new Buy("Margo", "Amazon", "USB");
-			Keep keep = new Keep("Ti6o", "Objective");
-
-			ksession.insert(buy1);
-			ksession.insert(buy2);
-			ksession.insert(keep);
-
-			ksession.fireAllRules();
-
-			Rule rule1 = (Rule) kbase.getRule("ruleml.translator", "buy&Keep");
-			GroupElement[] transformedLhs = rule1.getTransformedLhs();
-			translator.transformWhen(transformedLhs[0]);
-
-			logger.close();
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
-	}
 
 	/**
 	 * Helper method for reading the knowledge base
-	 * @return The knowledge base red from file 
+	 * 
+	 * @return The knowledge base red from file
 	 */
-	private KnowledgeBase readKnowledgeBase() throws Exception {
+	public static KnowledgeBase readKnowledgeBase(String fileName)
+			throws Exception {
 		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
 				.newKnowledgeBuilder();
-		kbuilder.add(ResourceFactory.newClassPathResource("test.drl"),
+		kbuilder.add(ResourceFactory.newClassPathResource(fileName),
 				ResourceType.DRL);
 		KnowledgeBuilderErrors errors = kbuilder.getErrors();
 		if (errors.size() > 0) {
@@ -102,92 +72,177 @@ public class Drools2RuleMLTranslator {
 	}
 
 	/**
-	 * The main method for the transformation. Transforms the root-groupelement
-	 * @param groupElement The root groupElement
+	 * The main entry point for the translation
+	 * 
+	 * @param kbase
+	 *            The knowledge base
+	 * @return Serialized RuleML
 	 */
-	private void transformWhen(GroupElement groupElement) {
+	public static String translate(KnowledgeBase kbase) {
+		Drools2RuleMLTranslator translator = new Drools2RuleMLTranslator();
 
-		// add all the constraints to the list (slots)
+		String result = "";
+
+		// get the packages from the knowledge base
+		Collection<KnowledgePackage> knowledgePackages = kbase
+				.getKnowledgePackages();
+		// iterate over the packages
+		for (KnowledgePackage knowledgePackage : knowledgePackages) {
+			// get the rules from the package
+			Collection<org.drools.definition.rule.Rule> rules = knowledgePackage
+					.getRules();
+			// iterate over the rules in the package
+			for (org.drools.definition.rule.Rule rule : rules) {
+				// get the rule
+				Rule rule_ = (Rule) kbase.getRule(rule.getPackageName(),
+						rule.getName());
+				// get the root group element
+				GroupElement[] transformedLhs = rule_.getTransformedLhs();
+				// transform the rule
+				JAXBElement<?> element = translator
+						.processGroupElement(transformedLhs[0]);
+
+				result += translator.wrapElement(element)
+						+ "\n*********************************************************\n";
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Creates the wrapper on the group element
+	 * 
+	 * @param element
+	 *            The main group elelemnt of the Drools-LHS
+	 * @return Serialized RuleML
+	 */
+	private String wrapElement(JAXBElement<?> element) {
+		// create the wrapper for the current use case ( RuleML -> Assert ->
+		// Implies -> If)
+		JAXBElement<IfType> ifType = creator
+				.createIf(new JAXBElement<?>[] { element });
+		JAXBElement<ImpliesType> implies = creator
+				.createImplies(new JAXBElement<?>[] { ifType });
+		JAXBElement<AssertType> assertType = creator
+				.createAssert(new JAXBElement<?>[] { implies });
+		JAXBElement<RuleMLType> ruleML = creator
+				.createRuleML(new JAXBElement<?>[] { assertType });
+
+		// serialize and return
+		return creator.marshal(ruleML);
+	}
+
+	/**
+	 * The main method for a transformation of the lhs-part of drools model.
+	 * Transforms the root-groupelement
+	 * 
+	 * @param groupElement
+	 *            The root groupElement
+	 */
+	private JAXBElement<?> processGroupElement(GroupElement groupElement) {
+
+		// collector for all the atoms in the when part
 		List<JAXBElement<?>> atoms = new ArrayList<JAXBElement<?>>();
-		
-		// iterate over the element groups
+
+		// iterate over the elements in the element group and collect them in the list (patterns or groups)
 		for (Object obj : groupElement.getChildren()) {
 			if (obj instanceof Pattern) {
-				Pattern pattern = (Pattern) obj;
-
-				// get the properties of the relation
-				List<String> propertiesList = getRelationPropertiesFromClass(pattern);
-
-				// add all the constraints to the list (slots)
-				List<JAXBElement<?>> atomContent = new ArrayList<JAXBElement<?>>();
-
-				// create the rel
-				String relName = ((ClassObjectType)pattern.getObjectType()).getClassType().getSimpleName();
-				RelType relType = creator.createRel(relName);
-				JAXBElement<OpAtomType> opType = creator.createOp(relType);
-				atomContent.add(opType);
-
-				// iterate over the constratints
-				for (Object constraint : pattern.getConstraints()) {
-					ClassFieldReader field = null;
-
-					if (constraint instanceof Declaration) {
-						field = processDeclaration(atomContent, constraint);
-					} else if (constraint instanceof LiteralConstraint) {
-						field = processLiteralConstraint(atomContent, constraint);
-					} else if (constraint instanceof VariableConstraint) {
-						field = processVarConstraint(atomContent, constraint);
-					}
-
-					// remove the current property from the list
-					if (field != null) {
-						propertiesList.remove(field.getFieldName());
-					}
-				}
-
-				// add the rest of the properties of the relation
-				for (String property : propertiesList) {
-					System.out.printf("SLOT: %s VAR %s\n", property, ".....");
-				}
-
-				AtomType atom = creator.createAtom(atomContent
-						.toArray(new JAXBElement<?>[atomContent.size()]));
-
-				atoms.add(creator.getFactory().createAtom(atom));
-
+				// process the pattern
+				atoms.add(processPattern((Pattern) obj));
 			} else if (obj instanceof GroupElement) {
-				transformWhen((GroupElement) obj);
+				// recursive call to same method
+				atoms.add(processGroupElement((GroupElement) obj));
 			}
 		}
 
-		// create the main part of the group element
+		// processes the type of the groupelement (AND,OR,NOT,FORALL,EXISTS)
 		Type type = groupElement.getType();
-		if(type.equals(Type.AND)) {
-			// create AND
-			AndInnerType and = creator.createAnd(atoms.toArray(new JAXBElement<?>[atoms.size()]));
-			creator.test(and);
+		if (type.equals(Type.AND)) {
+			return creator.createAnd(atoms.toArray(new JAXBElement<?>[atoms
+					.size()]));
 		} else if (type.equals(Type.OR)) {
-			// create OR
-			OrInnerType or = creator.createOr(atoms.toArray(new JAXBElement<?>[atoms.size()]));
+			return creator.createOr(atoms.toArray(new JAXBElement<?>[atoms
+					.size()]));
 		} else if (type.equals(Type.NOT)) {
-			// TODO create NOT
+			return creator.createNeg(atoms.toArray(new JAXBElement<?>[atoms
+					.size()]));
 		} else if (type.equals(Type.EXISTS)) {
-			// TODO create EXISTS
-		}			
+			return creator.createExists(atoms.toArray(new JAXBElement<?>[atoms
+			                                      					.size()]));		}
+		throw new UnsupportedOperationException();
+
+	}
+
+	private JAXBElement<AtomType> processPattern(Pattern pattern) {
+		// get the properties of the relation
+		List<String> propertiesList = getRelationPropertiesFromClass(pattern);
+
+		// add all the constraints to the list (slots)
+		List<JAXBElement<?>> atomContent = new ArrayList<JAXBElement<?>>();
+
+		// creates the ruleml REL with the relation name
+		processRel(pattern, atomContent);
+
+		// process all the constraints of the pattern
+		processConstraints(pattern, propertiesList, atomContent);
+
+		// TODO add the rest of the properties of the relation
+		for (String property : propertiesList) {
+			System.out.printf("SLOT: %s VAR %s\n", property, ".....");
+		}
+
+		return creator.createAtom(atomContent
+				.toArray(new JAXBElement<?>[atomContent.size()]));
+	}
+
+	private void processRel(Pattern pattern, List<JAXBElement<?>> atomContent) {
+		// create the rel
+		String relName = ((ClassObjectType) pattern.getObjectType())
+				.getClassType().getSimpleName();
+		RelType relType = creator.createRel(relName);
+		JAXBElement<OpAtomType> opType = creator.createOp(relType);
+		atomContent.add(opType);
+	}
+
+	private void processConstraints(Pattern pattern,
+			List<String> propertiesList, List<JAXBElement<?>> atomContent) {
+		// iterate over the constratints
+		for (Object constraint : pattern.getConstraints()) {
+			ClassFieldReader field = null;
+
+			if (constraint instanceof Declaration) {
+				field = processDeclaration(atomContent, constraint);
+			} else if (constraint instanceof LiteralConstraint) {
+				field = processLiteralConstraint(atomContent, constraint);
+			} else if (constraint instanceof VariableConstraint) {
+				field = processVarConstraint(atomContent, constraint);
+			} else if (constraint instanceof OrConstraint) {
+				OrConstraint orConstraint = (OrConstraint) constraint;
+				AlphaNodeFieldConstraint[] alphaConstraints = orConstraint
+						.getAlphaConstraints();
+				for (AlphaNodeFieldConstraint alphaNodeFieldConstraint : alphaConstraints) {
+					if (alphaNodeFieldConstraint instanceof LiteralConstraint) {
+						processLiteralConstraint(atomContent,
+								alphaNodeFieldConstraint);
+					}
+				}
+			}
+
+			// remove the current property from the list
+			if (field != null) {
+				propertiesList.remove(field.getFieldName());
+			}
+		}
 	}
 
 	/**
-	 * TODO
-	 * Not implemented yet.
-	 */
-	private void transformThen () {
-	}
-	
-	/**
 	 * Processes Declaration from pattern
-	 * @param elements The content elements (slot, var, rel, ind)
-	 * @param constraint Not converted Declaration as constraint
-	 * @return The drools reader of the property for the declaration 
+	 * 
+	 * @param elements
+	 *            The content elements (slot, var, rel, ind)
+	 * @param constraint
+	 *            Not casted Declaration as constraint
+	 * @return The drools reader of the property for the declaration
 	 */
 	private ClassFieldReader processDeclaration(List<JAXBElement<?>> elements,
 			Object constraint) {
@@ -195,16 +250,20 @@ public class Drools2RuleMLTranslator {
 		Declaration declaration = (Declaration) constraint;
 		field = (ClassFieldReader) declaration.getExtractor();
 
-		elements.add(creator.createSlot(creator.createInd(field.getFieldName()),
+		elements.add(creator.createSlot(
+				creator.createInd(field.getFieldName()),
 				creator.createVar(declaration.getIdentifier())));
 		return field;
 	}
 
 	/**
-	 * Processes LiteralConstraint from pattern (i.e  buyer == "John")
-	 * @param elements The content elements (slot, var, rel, ind)
-	 * @param constraint Not converted LiteralConstraint as constraint
-	 * @return The drools reader of the property for the declaration 
+	 * Processes LiteralConstraint from pattern (i.e buyer == "John")
+	 * 
+	 * @param elements
+	 *            The casted elements (slot, var, rel, ind)
+	 * @param constraint
+	 *            Not converted LiteralConstraint as constraint
+	 * @return The drools reader of the property for the declaration
 	 */
 	private ClassFieldReader processLiteralConstraint(
 			List<JAXBElement<?>> elements, Object constraint) {
@@ -212,16 +271,21 @@ public class Drools2RuleMLTranslator {
 		LiteralConstraint literalConstraint = (LiteralConstraint) constraint;
 		field = (ClassFieldReader) literalConstraint.getFieldExtractor();
 
-		elements.add(creator.createSlot(creator.createInd(field.getFieldName()),
-				creator.createVar(literalConstraint.getField().getValue().toString())));
+		elements.add(creator.createSlot(
+				creator.createInd(field.getFieldName()),
+				creator.createInd(literalConstraint.getField().getValue()
+						.toString())));
 		return field;
 	}
 
 	/**
 	 * Processes VarConstraint from pattern (i.e buyer == $person)
-	 * @param elements The content elements (slot, var, rel, ind)
-	 * @param constraint Not converted VarConstraint as constraint
-	 * @return The drools reader of the property for the declaration 
+	 * 
+	 * @param elements
+	 *            The content elements (slot, var, rel, ind)
+	 * @param constraint
+	 *            Not casted VarConstraint as constraint
+	 * @return The drools reader of the property for the declaration
 	 */
 	private ClassFieldReader processVarConstraint(
 			List<JAXBElement<?>> elements, Object constraint) {
@@ -230,16 +294,43 @@ public class Drools2RuleMLTranslator {
 		field = (ClassFieldReader) variableConstraint.getFieldExtractor();
 
 		if (variableConstraint.getRequiredDeclarations().length > 0) {
-			elements.add(creator.createSlot(creator.createInd(field.getFieldName()),
-					creator.createVar(variableConstraint.getRequiredDeclarations()[0]
-							.getIdentifier())));
+			elements.add(creator.createSlot(creator.createInd(field
+					.getFieldName()), creator.createVar(variableConstraint
+					.getRequiredDeclarations()[0].getIdentifier())));
 		}
 		return field;
 	}
 
 	/**
-	 * Gets all the properties of a data class (relation) to translate them in ruleml. 
-	 * @param pattern The Dlr Pattern for which the relation should be created.
+	 * Processes OrConstraint from pattern
+	 * 
+	 * @param elements
+	 *            The content elements (slot, var, rel, ind)
+	 * @param constraint
+	 *            Not casted rConstrainte constraint
+	 * @return The drools reader of the property for the declaration
+	 */
+	// private ClassFieldReader processOrConstraint(List<JAXBElement<?>>
+	// elements,
+	// Object constraint) {
+	// ClassFieldReader field;
+	//
+	//
+	// return field;
+	// }
+
+	/**
+	 * TODO Not implemented yet.
+	 */
+	private void transformThen() {
+	}
+
+	/**
+	 * Gets all the properties of a data class (relation) to translate them in
+	 * ruleml.
+	 * 
+	 * @param pattern
+	 *            The Dlr Pattern for which the relation should be created.
 	 * @return List of all properties of the class represented from the pattern.
 	 */
 	private static List<String> getRelationPropertiesFromClass(Pattern pattern) {

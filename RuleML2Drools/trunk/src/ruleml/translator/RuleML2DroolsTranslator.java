@@ -10,23 +10,23 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.drools.io.ResourceFactory;
+import naffolog.AndInnerType;
+import naffolog.AssertType;
+import naffolog.AtomType;
+import naffolog.IfType;
+import naffolog.ImpliesType;
+import naffolog.IndType;
+import naffolog.OpAtomType;
+import naffolog.OrInnerType;
+import naffolog.QueryType;
+import naffolog.RelType;
+import naffolog.RetractType;
+import naffolog.RuleMLType;
+import naffolog.SlotType;
+import naffolog.ThenType;
+import naffolog.VarType;
 
-import datalog.AndInnerType;
-import datalog.AssertType;
-import datalog.AtomType;
-import datalog.IfType;
-import datalog.ImpliesType;
-import datalog.IndType;
-import datalog.OpAtomType;
-import datalog.OrInnerType;
-import datalog.QueryType;
-import datalog.RelType;
-import datalog.RetractType;
-import datalog.RuleMLType;
-import datalog.SlotType;
-import datalog.ThenType;
-import datalog.VarType;
+import org.drools.io.ResourceFactory;
 
 /**
  * Translator for RuleML intput to Drools DLR-source.
