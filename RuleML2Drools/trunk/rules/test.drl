@@ -1,9 +1,26 @@
-package com.sample
-import com.sample.TestDataModel.*;
+package ruleml.translator
+import ruleml.translator.TestDataModel.*;
+
 rule "buy&Keep"
 when
-	Buy($person:buyer,$merchant:seller,$object:item)
-	Keep(keeper==$person,item=="test")
+	Person( $person: name == "john" , age < 13 || age > 19 )
+	b:Buy(buyer==$person, $merchant:seller, $object:item)
+	exists(Keep(keeper==$person,item=="test"))
 then
 	insert( new Own($person,$object));
 end
+
+
+/**
+rule "rule2"
+when
+
+//		( Keep($person:keeper,item=="test") or
+//  			( Person( name == $person) and
+//    		  Person( age > 45 ) )
+//	not ( Person(name == "john") and
+//    	  Person(age == "13") )
+then
+        System.out.println(" John anyone, but no teenagers "); 
+end
+*/   

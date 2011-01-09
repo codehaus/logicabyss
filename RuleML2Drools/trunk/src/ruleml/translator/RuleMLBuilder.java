@@ -1,5 +1,7 @@
 package ruleml.translator;
 
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -8,30 +10,30 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.drools.rule.Rule;
-
-import datalog.AndInnerType;
-import datalog.AssertType;
-import datalog.AtomType;
-import datalog.IfType;
-import datalog.ImpliesType;
-import datalog.IndType;
-import datalog.ObjectFactory;
-import datalog.OpAtomType;
-import datalog.OrInnerType;
-import datalog.RelType;
-import datalog.RuleMLType;
-import datalog.SlotType;
-import datalog.ThenType;
-import datalog.VarType;
+import naffolog.AndInnerType;
+import naffolog.AssertType;
+import naffolog.AtomType;
+import naffolog.EquivalentType;
+import naffolog.ExistsType;
+import naffolog.IfType;
+import naffolog.ImpliesType;
+import naffolog.IndType;
+import naffolog.NegType;
+import naffolog.ObjectFactory;
+import naffolog.OpAtomType;
+import naffolog.OrInnerType;
+import naffolog.RelType;
+import naffolog.RuleMLType;
+import naffolog.SlotType;
+import naffolog.VarType;
 
 public class RuleMLBuilder {
 	private ObjectFactory factory = new ObjectFactory();
-	
-	public JAXBElement<SlotType> createSlot(JAXBElement<?> slotName,
+
+	public JAXBElement<SlotType> createSlot(JAXBElement<?> relationName,
 			JAXBElement<?> content) {
 		SlotType slotType = factory.createSlotType();
-		slotType.getContent().add(slotName);
+		slotType.getContent().add(relationName);
 		slotType.getContent().add(content);
 		return factory.createSlot(slotType);
 	}
@@ -48,30 +50,63 @@ public class RuleMLBuilder {
 		return factory.createInd(indType);
 	}
 
-	public AtomType createAtom(JAXBElement<?>[] content) {
+	public JAXBElement<AtomType> createAtom(JAXBElement<?>[] content) {
 		AtomType atomType = factory.createAtomType();
 		atomType.getContent().addAll(Arrays.asList(content));
-		return atomType;
+		return factory.createAtom(atomType);
 	}
 
-	public AndInnerType createAnd(JAXBElement<?>[] content) {
+	public JAXBElement<AndInnerType> createAnd(JAXBElement<?>[] content) {
 		AndInnerType andType = factory.createAndInnerType();
-		for (JAXBElement<?> jaxbElement : content) {
-			andType.getFormulaOrAtomOrAnd().add(jaxbElement.getValue());	
-		}
-		return andType;
-	}
-	
-	public OrInnerType createOr(JAXBElement<?>[] content) {
-		OrInnerType orType = factory.createOrInnerType();
-		for (JAXBElement<?> jaxbElement : content) {
-			orType.getFormulaOrAtomOrAnd().add(jaxbElement.getValue());	
-		}
-		return orType;
+		andType.getFormulaOrAtomOrAnd().addAll(convertJAXBArray(content));
+		return factory.createAnd(andType);
 	}
 
-	public ObjectFactory getFactory() {
-		return factory;
+	public JAXBElement<OrInnerType> createOr(JAXBElement<?>[] content) {
+		OrInnerType orType = factory.createOrInnerType();
+		orType.getFormulaOrAtomOrAnd().addAll(convertJAXBArray(content));
+		return factory.createOr(orType);
+	}
+
+	public JAXBElement<NegType> createNeg(JAXBElement<?>[] content) {
+		NegType negType = factory.createNegType();
+
+		for (JAXBElement<?> jaxbElement : content) {
+			if (jaxbElement.getValue() instanceof AndInnerType) {
+				negType.setAnd((AndInnerType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof OrInnerType) {
+				negType.setOr((OrInnerType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof AtomType) {
+				negType.setAtom((AtomType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof ImpliesType) {
+				negType.setImplies((ImpliesType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof EquivalentType) {
+				negType.setEquivalent((EquivalentType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof ExistsType) {
+				negType.setExists((ExistsType) jaxbElement.getValue());
+			}
+		}
+		return factory.createNeg(negType);
+	}
+
+	public JAXBElement<?> createExists(JAXBElement<?>[] content) {
+		ExistsType existsType = factory.createExistsType();
+		for (JAXBElement<?> jaxbElement : content) {
+			if (jaxbElement.getValue() instanceof AndInnerType) {
+				existsType.setAnd((AndInnerType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof OrInnerType) {
+				existsType.setOr((OrInnerType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof AtomType) {
+				existsType.setAtom((AtomType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof ImpliesType) {
+				existsType.setImplies((ImpliesType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof EquivalentType) {
+				existsType.setEquivalent((EquivalentType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof ExistsType) {
+				existsType.setExists((ExistsType) jaxbElement.getValue());
+			}
+		}
+		return factory.createExists(existsType);
 	}
 
 	public RelType createRel(String content) {
@@ -86,47 +121,61 @@ public class RuleMLBuilder {
 		return factory.createAtomTypeOp(opAtomType);
 	}
 
-	// private JAXBElement<IfType> createIf(JAXBElement<?>[] content) {
-	// IfType ifType = factory.createIfType();
-	//
-	// for (JAXBElement<?> jaxbElement : content) {
-	// if (jaxbElement.getDeclaredType() instanceof AndInnerType) {
-	//
-	// }
-	//
-	// }
-	//
-	// }
+	public JAXBElement<IfType> createIf(JAXBElement<?>[] content) {
+		IfType ifType = factory.createIfType();
 
-	public void test(AndInnerType and) {
+		for (JAXBElement<?> jaxbElement : content) {
+			if (jaxbElement.getValue() instanceof AndInnerType) {
+				ifType.setAnd((AndInnerType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof OrInnerType) {
+				ifType.setOr((OrInnerType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof AtomType) {
+				ifType.setAtom((AtomType) jaxbElement.getValue());
+			}
+		}
+
+		return factory.createIf(ifType);
+	}
+
+	public JAXBElement<AssertType> createAssert(JAXBElement<?>[] content) {
+		AssertType assertType = factory.createAssertType();
+		assertType.getFormulaOrRulebaseOrAtom().addAll(
+				convertJAXBArray(content));
+		return factory.createAssert(assertType);
+	}
+
+	public JAXBElement<RuleMLType> createRuleML(JAXBElement<?>[] content) {
+		RuleMLType ruleMLType = factory.createRuleMLType();
+		ruleMLType.getAssertOrRetractOrQuery()
+				.addAll(convertJAXBArray(content));
+		return factory.createRuleML(ruleMLType);
+	}
+
+	public JAXBElement<ImpliesType> createImplies(JAXBElement<?>[] content) {
+		ImpliesType impliesType = factory.createImpliesType();
+		impliesType.getContent().addAll(Arrays.asList(content));
+		return factory.createImplies(impliesType);
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private List<?> convertJAXBArray(JAXBElement<?>[] content) {
+		List result = new ArrayList();
+
+		for (JAXBElement<?> jaxbElement : content) {
+			result.add(jaxbElement.getValue());
+		}
+
+		return result;
+	}
+
+	public ObjectFactory getFactory() {
+		return factory;
+	}
+
+	public String marshal(JAXBElement<RuleMLType> ruleML) {
 		try {
-			JAXBContext jContext = JAXBContext.newInstance("datalog");
+			JAXBContext jContext = JAXBContext.newInstance("naffolog");
 			System.out.println("context ok");
-
-			RuleMLType ruleMLType = factory.createRuleMLType();
-			List<Object> assertOrRetractOrQueryList = ruleMLType
-					.getAssertOrRetractOrQuery();
-
-			AssertType assertType = factory.createAssertType();
-			assertOrRetractOrQueryList.add(assertType);
-
-			List<Object> formulaOrRulebaseOrAtomList = assertType
-					.getFormulaOrRulebaseOrAtom();
-
-			// if
-			IfType ifType = factory.createIfType();
-			ifType.setAnd(and);
-
-			// then
-			ThenType thenType = factory.createThenType();
-			
-			// implies
-			ImpliesType impliesType = factory.createImpliesType();
-			impliesType.getContent().add(factory.createIf(ifType));
-			impliesType.getContent().add(factory.createThen(thenType));
-
-			// add implies to assert
-			formulaOrRulebaseOrAtomList.add(impliesType);
 
 			Marshaller marshaller = jContext.createMarshaller();
 
@@ -135,96 +184,12 @@ public class RuleMLBuilder {
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
 					Boolean.TRUE);
 
-			marshaller.marshal(ruleMLType, System.out);
+			StringWriter writer = new StringWriter();
+			marshaller.marshal(ruleML.getValue(), writer);
+			return writer.toString();
 		} catch (JAXBException e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-	}
-
-	public String testTransformToRuleML(Rule rule) throws JAXBException {
-		JAXBContext jContext = JAXBContext.newInstance("datalog");
-		System.out.println("context ok");
-
-		StringBuffer result = new StringBuffer();
-
-		RuleMLType ruleMLType = factory.createRuleMLType();
-		List<Object> assertOrRetractOrQueryList = ruleMLType
-				.getAssertOrRetractOrQuery();
-
-		AssertType assertType = factory.createAssertType();
-		assertOrRetractOrQueryList.add(assertType);
-
-		List<Object> formulaOrRulebaseOrAtomList = assertType
-				.getFormulaOrRulebaseOrAtom();
-
-		// AND
-		AndInnerType andInnerType = factory.createAndInnerType();
-
-		// atom buy
-		AtomType atomType = factory.createAtomType();
-
-		RelType relType = factory.createRelType();
-		relType.getContent().add("buy");
-
-		OpAtomType opAtomType = factory.createOpAtomType();
-		opAtomType.setRel(relType);
-
-		VarType varType1 = factory.createVarType();
-		varType1.getContent().add("person");
-
-		VarType varType2 = factory.createVarType();
-		varType2.getContent().add("merchant");
-
-		VarType varType3 = factory.createVarType();
-		varType3.getContent().add("object");
-
-		atomType.getContent().add(factory.createOp(opAtomType));
-		atomType.getContent().add(factory.createVar(varType1));
-		atomType.getContent().add(factory.createVar(varType2));
-		atomType.getContent().add(factory.createVar(varType3));
-
-		andInnerType.getFormulaOrAtomOrAnd().add(atomType);
-
-		// atom own
-		atomType = factory.createAtomType();
-
-		relType = factory.createRelType();
-		relType.getContent().add("keep");
-
-		opAtomType = factory.createOpAtomType();
-		opAtomType.setRel(relType);
-
-		varType1 = factory.createVarType();
-		varType1.getContent().add("person");
-
-		varType2 = factory.createVarType();
-		varType2.getContent().add("object");
-
-		atomType.getContent().add(factory.createOp(opAtomType));
-		atomType.getContent().add(factory.createVar(varType1));
-		atomType.getContent().add(factory.createVar(varType2));
-
-		andInnerType.getFormulaOrAtomOrAnd().add(atomType);
-
-		// if
-		IfType ifType = factory.createIfType();
-		ifType.setAnd(andInnerType);
-
-		// implies
-		ImpliesType impliesType = factory.createImpliesType();
-		impliesType.getContent().add(factory.createIf(ifType));
-
-		// add implies to assert
-		formulaOrRulebaseOrAtomList.add(impliesType);
-
-		Marshaller marshaller = jContext.createMarshaller();
-
-		System.out.println("marshaller  ready");
-
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
-		marshaller.marshal(ruleMLType, System.out);
-
-		return result.toString();
 	}
 }
