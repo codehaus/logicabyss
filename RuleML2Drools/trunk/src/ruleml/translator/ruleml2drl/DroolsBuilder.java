@@ -1,4 +1,4 @@
-package ruleml.translator;
+package ruleml.translator.ruleml2drl;
 
 import java.util.ArrayList;
 import java.util.List;

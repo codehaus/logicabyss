@@ -1,4 +1,4 @@
-package ruleml.translator;
+package ruleml.translator.ruleml2drl;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -218,7 +218,7 @@ public class RuleML2DroolsTranslator {
 		// process the ind
 		dispatchType(content.get(0).getValue());
 
-		// check if the current context part (IF or THEN)
+		// check the current context part (IF or THEN)
 		if (currentPartType.equals(PartType.IF)) {
 			if (currentDlrPattern != null) {
 				// check if the var was already bound

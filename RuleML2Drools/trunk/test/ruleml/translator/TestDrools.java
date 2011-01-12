@@ -11,6 +11,8 @@ import org.junit.Test;
 
 import ruleml.translator.TestDataModel.Buy;
 import ruleml.translator.TestDataModel.Keep;
+import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator;
+import ruleml.translator.ruleml2drl.RuleML2DroolsTranslator;
 
 public class TestDrools {
 

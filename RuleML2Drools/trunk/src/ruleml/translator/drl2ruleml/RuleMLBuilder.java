@@ -1,4 +1,4 @@
-package ruleml.translator;
+package ruleml.translator.drl2ruleml;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
