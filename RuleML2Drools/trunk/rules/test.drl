@@ -3,11 +3,12 @@ import ruleml.translator.TestDataModel.*;
 
 rule "buy&Keep"
 when
-	Person( $person: name == "john" , age < 13 || age > 19 )
-	b:Buy(buyer==$person, $merchant:seller, $object:item)
-	exists(Keep(keeper==$person,item=="test"))
+//	Person( $person: name == "john" , age < 13 || age > 19 )
+    Person( $person: name == "john", age < 13 )
+//	b:Buy(buyer==$person, $merchant:seller, $object:item)
+//	exists(Keep(keeper==$person,item=="test"))
 then
-	insert( new Own($person,$object));
+	//insert( new Own($person,$object));
 end
 
 
