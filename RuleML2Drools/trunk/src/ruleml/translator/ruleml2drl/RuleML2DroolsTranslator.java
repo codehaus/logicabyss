@@ -112,7 +112,7 @@ public class RuleML2DroolsTranslator {
 	 */
 	public static RuleMLType readRuleML(String fileName) {
 		try {
-			JAXBContext jContext = JAXBContext.newInstance("datalog");
+			JAXBContext jContext = JAXBContext.newInstance("naffolog");
 			Unmarshaller unmarshaller = jContext.createUnmarshaller();
 			JAXBElement<?> unmarshal = (JAXBElement<?>) unmarshaller
 					.unmarshal(ResourceFactory.newClassPathResource(fileName

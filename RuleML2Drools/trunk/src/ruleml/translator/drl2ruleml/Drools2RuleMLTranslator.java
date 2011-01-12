@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
 
+import naffolog.AndInnerType;
 import naffolog.AssertType;
 import naffolog.AtomType;
 import naffolog.IfType;
@@ -52,7 +53,7 @@ import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator.PropertyInfo.ValueTy
  */
 public class Drools2RuleMLTranslator {
 
-	private RuleMLBuilder builder = new RuleMLBuilder();
+	public static RuleMLBuilder builder = new RuleMLBuilder();
 
 	public static class PropertyInfo {
 		private String name;
@@ -272,6 +273,14 @@ public class Drools2RuleMLTranslator {
 				slots, pattern);
 		atomContent.addAll(unUsedProperties);
 
+		if (constraintsAnalyzer.getOther().size() > 0 ) {
+			List<JAXBElement<?>> other = constraintsAnalyzer.getOther();
+			other.add(builder.createAtom(atomContent
+					.toArray(new JAXBElement<?>[atomContent.size()])));
+			JAXBElement<AndInnerType> and = builder.createAnd(other.toArray(new JAXBElement<?>[other.size()]));
+			return and;
+		}
+		
 		return builder.createAtom(atomContent
 				.toArray(new JAXBElement<?>[atomContent.size()]));
 	}
