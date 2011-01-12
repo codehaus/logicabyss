@@ -4,20 +4,40 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
+import javax.xml.bind.JAXBElement;
+
+import naffolog.AtomType;
+import naffolog.IndType;
+import naffolog.OpAtomType;
+import naffolog.RelType;
+import naffolog.VarType;
 
 import org.drools.base.ClassFieldReader;
+import org.drools.base.evaluators.ComparableEvaluatorsDefinition.IntegerGreaterEvaluator;
+import org.drools.base.evaluators.ComparableEvaluatorsDefinition.IntegerGreaterOrEqualEvaluator;
+import org.drools.base.evaluators.ComparableEvaluatorsDefinition.IntegerLessEvaluator;
+import org.drools.base.evaluators.ComparableEvaluatorsDefinition.IntegerLessOrEqualEvaluator;
+import org.drools.base.evaluators.EqualityEvaluatorsDefinition.IntegerEqualEvaluator;
+import org.drools.base.evaluators.EqualityEvaluatorsDefinition.StringEqualEvaluator;
 import org.drools.rule.Declaration;
 import org.drools.rule.LiteralConstraint;
 import org.drools.rule.OrConstraint;
 import org.drools.rule.Pattern;
 import org.drools.rule.VariableConstraint;
+import org.drools.spi.Evaluator;
+
+import com.google.common.collect.ImmutableBiMap.Builder;
+import com.sun.xml.internal.ws.message.RelatesToHeader;
 
 import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator.PropertyInfo;
 import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator.PropertyInfo.ValueType;
 
 public class ConstraintsAnalyzer {
 	
-	private List<?> other = new ArrayList();
+	private List<Integer> uniqueVars = new ArrayList<Integer>();
+	private List<JAXBElement<?>> other = new ArrayList<JAXBElement<?>>();
 	
 	public List getOther () {
 		return this.other;
@@ -134,14 +154,63 @@ public class ConstraintsAnalyzer {
 		ClassFieldReader field = (ClassFieldReader) literalConstraint
 				.getFieldExtractor();
 
-//		literalConstraint.
+		Evaluator evaluator = literalConstraint.getEvaluator();;
+		String relationName = "";
+		
+		if (evaluator instanceof StringEqualEvaluator || evaluator instanceof IntegerEqualEvaluator) {
+			PropertyInfo propertyInfo = new PropertyInfo();
+			propertyInfo.setName(field.getFieldName());
+			propertyInfo.setValue(literalConstraint.getField().getValue()
+					.toString());
+			propertyInfo.setType(ValueType.IND);
+			return propertyInfo;
+		} else if (evaluator instanceof IntegerLessEvaluator) {
+			relationName = "LessThan";
+		} else if (evaluator instanceof IntegerLessOrEqualEvaluator) {
+			relationName = "lessThanOrEqual";
+		} else if (evaluator instanceof IntegerGreaterEvaluator) {
+			relationName = "greaterThan";
+		} else if (evaluator instanceof IntegerGreaterOrEqualEvaluator) {
+			relationName = "greaterThanOrEquals";
+		}
+
+		List<JAXBElement<?>> content = new ArrayList<JAXBElement<?>>();
+		
+		// create the relation
+		RelType relType = Drools2RuleMLTranslator.builder.createRel(relationName);
+		JAXBElement<?> opAtom = Drools2RuleMLTranslator.builder.createOp(relType);
+		content.add(opAtom);
+		
+		// create the data in the relation
+		String var = createUniqueVar();
+		JAXBElement<VarType> varType = Drools2RuleMLTranslator.builder.createVar(var);
+		content.add(varType);
+		
+		JAXBElement<IndType> indType = Drools2RuleMLTranslator.builder.createInd(literalConstraint.getField().getValue().toString());
+		content.add(indType);
+		
+		// create new Atom with the the other relation
+		JAXBElement<AtomType> createAtom = Drools2RuleMLTranslator.builder.createAtom(content.toArray(new JAXBElement<?>[content.size()]));
+
+		this.other.add(createAtom);
 		
 		PropertyInfo propertyInfo = new PropertyInfo();
 		propertyInfo.setName(field.getFieldName());
-		propertyInfo.setValue(literalConstraint.getField().getValue()
-				.toString());
-		propertyInfo.setType(ValueType.IND);
+		propertyInfo.setVar(var);
+		propertyInfo.setType(ValueType.VAR);
 		return propertyInfo;
+	}
+
+	private String createUniqueVar() {
+		Random random = new Random();
+		int unique;
+		do {
+			unique = random.nextInt(1000);
+		} while (this.uniqueVars.contains(unique));
+		
+		uniqueVars.add(new Integer(unique));
+		
+		return "VAR" + unique;
 	}
 
 	/**
