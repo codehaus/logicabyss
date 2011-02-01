@@ -113,6 +113,22 @@
      content model: (  Atom | And | Or | Equal | Naf | Neg | Rule )
 			** @jabarski **          
 -->
+	<xs:attributeGroup name="if.attlist">
+		<xs:attributeGroup ref="arg.attrib"/>
+	</xs:attributeGroup>	
+	<xs:group name="if.content">
+		<xs:choice>
+			<xs:group ref="if.content"/> 
+			<xs:element ref="Rule"/>			
+		</xs:choice>
+	</xs:group>
+	<xs:complexType name="if.type">
+		<xs:group ref="if.content"/>
+		<xs:attributeGroup ref="if.attlist"/>
+	</xs:complexType>
+	<xs:element name="if" type="if.type"/>
+	<xs:element name="after" type="if.type"/>
+	<xs:element name="elseAfter" type="if.type"/>
 
 <!--
      *** then ***
