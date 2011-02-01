@@ -238,13 +238,23 @@
 	add Naf, Neg so that body's content model is:
 	(Atom | And | Or | Equal | Naf | Neg)
 		** @jabarski
--->
 	<xs:group name="if.content">
 		<xs:choice>
 			<xs:group ref="if.content"/>
 			<xs:group ref="naf_neg.content"/>
 		</xs:choice>
 	</xs:group>
+-->
+	
+	<xs:attributeGroup name="if.attlist">
+		<xs:attributeGroup ref="arg.attrib"/>
+	</xs:attributeGroup>	
+	<xs:group name="if.content">
+		<xs:choice>
+			<xs:group ref="if.content"/> 
+			<xs:element ref="Rule"/>			
+		</xs:choice>
+	</xs:group>	
 	
 <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
 
