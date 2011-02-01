@@ -265,11 +265,6 @@
 			<xs:element ref="Rule"/>			
 		</xs:choice>
 	</xs:group>
-	<xs:complexType name="if.type">
-		<xs:group ref="if.content"/>
-		<xs:attributeGroup ref="if.attlist"/>
-	</xs:complexType>
-	
 
 <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
 
@@ -389,6 +384,10 @@
 			
 </xs:redefine>
 
+	<xs:complexType name="if.type">
+		<xs:group ref="if.content"/>
+		<xs:attributeGroup ref="if.attlist"/>
+	</xs:complexType>
 
 
 
