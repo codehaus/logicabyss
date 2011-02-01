@@ -136,7 +136,6 @@
      
      content model: (  Atom  | Neg | Equal )
           	** @jabarski **
--->
 	<xs:attributeGroup name="then1.attlist">
 		<xs:attributeGroup ref="arg.attrib"/>
 	</xs:attributeGroup>	
@@ -150,6 +149,7 @@
 		<xs:attributeGroup ref="then1.attlist"/>
 	</xs:complexType>
 	<xs:element name="then1" type="then1.type"/>
+-->
 	<xs:element name="else" type="then.type"/>
 
 <!--
