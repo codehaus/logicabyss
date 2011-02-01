@@ -45,11 +45,10 @@
 	   
 	<xs:include schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/modules/root_module.xsd"/>			
 	<xs:include schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/modules/attribute_module.xsd"/>
+	<xs:include schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/modules/rule_module.xsd"/>
 
 
 <xs:redefine schemaLocation="http://www.ruleml.org/1.0/xsd/hornlogeq.xsd">
-
-	<xs:include schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/modules/rule_module.xsd"/>
 
 <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->	
 
@@ -239,13 +238,37 @@
 	add Naf, Neg so that body's content model is:
 	(Atom | And | Or | Equal | Naf | Neg)
 		** @jabarski
--->
 	<xs:group name="if.content">
 		<xs:choice>
 			<xs:group ref="if.content"/>
 			<xs:group ref="naf_neg.content"/>
 		</xs:choice>
 	</xs:group>
+-->
+	
+	
+<!--
+     *** if ***
+     *** after ***
+     *** elseAfter ***
+     
+     content model: (  Atom | And | Or | Equal | Naf | Neg | Rule )
+			** @jabarski **          
+-->
+	<xs:attributeGroup name="if.attlist">
+		<xs:attributeGroup ref="arg.attrib"/>
+	</xs:attributeGroup>	
+	<xs:group name="if.content">
+		<xs:choice>
+			<xs:group ref="if.content"/>
+			<xs:group ref="naf_neg.content"/>
+			<xs:element ref="Rule"/>			
+		</xs:choice>
+	</xs:group>
+	<xs:complexType name="if.type">
+		<xs:group ref="if.content"/>
+		<xs:attributeGroup ref="if.attlist"/>
+	</xs:complexType>
 	
 
 <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
