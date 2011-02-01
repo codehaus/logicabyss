@@ -113,9 +113,6 @@
      content model: (  Atom | And | Or | Equal | Naf | Neg | Rule )
 			** @jabarski **          
 -->
-	<xs:element name="if" type="if.type"/>
-	<xs:element name="after" type="if.type"/>
-	<xs:element name="elseAfter" type="if.type"/>	
 
 <!--
      *** then ***
