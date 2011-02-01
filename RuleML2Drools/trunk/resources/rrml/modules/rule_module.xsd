@@ -322,7 +322,7 @@
 			<xs:element ref="on"/>
 			<xs:sequence minOccurs="0">
 				<xs:element ref="if" minOccurs="0"/>
-				<xs:element ref="then1" minOccurs="0"/>
+				<xs:element ref="then" minOccurs="0"/>
 				<xs:element ref="do"/>
 			    <xs:element ref="after" minOccurs="0"/>
 				<xs:element ref="else" minOccurs="0"/>
