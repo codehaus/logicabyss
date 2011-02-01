@@ -112,7 +112,6 @@
      
      content model: (  Atom | And | Or | Equal | Naf | Neg | Rule )
 			** @jabarski **          
--->
 	<xs:attributeGroup name="if.attlist">
 		<xs:attributeGroup ref="arg.attrib"/>
 	</xs:attributeGroup>	
@@ -127,6 +126,7 @@
 		<xs:attributeGroup ref="if.attlist"/>
 	</xs:complexType>
 	<xs:element name="if" type="if.type"/>
+-->
 	<xs:element name="after" type="if.type"/>
 	<xs:element name="elseAfter" type="if.type"/>
 
