@@ -224,13 +224,23 @@
 	add Neg so that head's content model is:
 	(Atom | Equal | Neg)
 		** @jabarski
--->
 	<xs:group name="then.content">
 		<xs:choice>
 			<xs:group ref="then.content"/>
 			<xs:element ref="Neg"/>			
 		</xs:choice>
 	</xs:group>
+-->
+
+	<xs:attributeGroup name="then.attlist">
+		<xs:attributeGroup ref="arg.attrib"/>
+	</xs:attributeGroup>	
+	<xs:group name="then.content">
+		<xs:choice>
+			<xs:group ref="then.content"/> 
+		</xs:choice>
+	</xs:group>
+
 
 <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
 
