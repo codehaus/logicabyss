@@ -446,10 +446,8 @@
 			</xs:choice>	
 </xs:group>
 
-	<xs:complexType name="if.type">
-		<xs:group ref="if.content"/>
-		<xs:attributeGroup ref="if.attlist"/>
-	</xs:complexType>
+	<xs:element name="after" type="if.type"/>
+	<xs:element name="elseAfter" type="if.type"/>	
 
 	
 </xs:schema>
