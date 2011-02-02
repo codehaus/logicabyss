@@ -435,6 +435,7 @@
                 | Disjunction | Xor | Conjunction | Concurrent | Not | Any | Aperiodic 
                 | Periodic , on |  Naf | Neg | Atom | Rule | Message |  time | Ind | Var | Expr | Sequence | Disjunction | 
                 Xor | Conjunction | Concurrent | Not | Any | Aperiodic | Periodic)
+-->	
 
 <xs:attributeGroup name="Interval.attlist"/>
 	<xs:group name="Interval.content">
@@ -445,11 +446,16 @@
 		</xs:sequence>
 	</xs:group>
 	<xs:complexType name="Interval.type">
+		<xsd:annotation>
+      		<xsd:appinfo>
+         		<jxb:class name="IntervalSuperType">
+         		</jxb:class>
+      		</xsd:appinfo>
+
 		<xs:group ref="Interval.content"/>
 		<xs:attributeGroup ref="Interval.attlist"/>
 	</xs:complexType>
 	<xs:element name="Interval" type="Interval.type"/>
--->	
 
 <!--
      *** interval_group.content ***
