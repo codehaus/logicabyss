@@ -81,11 +81,23 @@ targetNamespace="http://www.ruleml.org/1.0/xsd" elementFormDefault="qualified">
 		</xs:sequence>
 	</xs:group>
 	<xs:complexType name="interval.type">
+		<xs:annotation>
+      		<xs:appinfo>
+         		<jxb:class name="IntervalSuperType"/>
+      		</xs:appinfo>
+		</xs:annotation>
+
 		<xs:group ref="interval.content"/>
 		<xs:attributeGroup ref="interval.attlist"/>
 	</xs:complexType>
 	
 	<xs:element name="interval" type="interval.type">
+			<xs:annotation>
+      		<xs:appinfo>
+         		<jxb:class name="IntervalSuper"/>
+				<jxb:property name="IntervalSuper"/>
+      		</xs:appinfo>
+		</xs:annotation>	
 	</xs:element>
 	
 <xs:group name="action_algebra_group.content">
@@ -447,22 +459,11 @@ targetNamespace="http://www.ruleml.org/1.0/xsd" elementFormDefault="qualified">
 		</xs:sequence>
 	</xs:group>
 	<xs:complexType name="Interval.type">
-		<xs:annotation>
-      		<xs:appinfo>
-         		<jxb:class name="IntervalSuperType"/>
-      		</xs:appinfo>
-		</xs:annotation>
 
 		<xs:group ref="Interval.content"/>
 		<xs:attributeGroup ref="Interval.attlist"/>
 	</xs:complexType>
 	<xs:element name="Interval" type="Interval.type">
-			<xs:annotation>
-      		<xs:appinfo>
-         		<jxb:class name="IntervalSuper"/>
-				<jxb:property name="IntervalSuper"/>
-      		</xs:appinfo>
-		</xs:annotation>	
 	</xs:element>
 
 <!--
