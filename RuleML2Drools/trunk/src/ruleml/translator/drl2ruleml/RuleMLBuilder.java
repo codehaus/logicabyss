@@ -10,22 +10,23 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import naffolog.AndInnerType;
-import naffolog.AssertType;
-import naffolog.AtomType;
-import naffolog.EquivalentType;
-import naffolog.ExistsType;
-import naffolog.IfType;
-import naffolog.ImpliesType;
-import naffolog.IndType;
-import naffolog.NegType;
-import naffolog.ObjectFactory;
-import naffolog.OpAtomType;
-import naffolog.OrInnerType;
-import naffolog.RelType;
-import naffolog.RuleMLType;
-import naffolog.SlotType;
-import naffolog.VarType;
+import reactionruleml.AndInnerType;
+import reactionruleml.AssertType;
+import reactionruleml.AtomType;
+import reactionruleml.EqualType;
+import reactionruleml.EquivalentType;
+import reactionruleml.ExistsType;
+import reactionruleml.IfType;
+import reactionruleml.ImpliesType;
+import reactionruleml.IndType;
+import reactionruleml.NegType;
+import reactionruleml.ObjectFactory;
+import reactionruleml.OpAtomType;
+import reactionruleml.OrInnerType;
+import reactionruleml.RelType;
+import reactionruleml.RuleMLType;
+import reactionruleml.SlotType;
+import reactionruleml.VarType;
 
 public class RuleMLBuilder {
 	private ObjectFactory factory = new ObjectFactory();
@@ -72,18 +73,10 @@ public class RuleMLBuilder {
 		NegType negType = factory.createNegType();
 
 		for (JAXBElement<?> jaxbElement : content) {
-			if (jaxbElement.getValue() instanceof AndInnerType) {
-				negType.setAnd((AndInnerType) jaxbElement.getValue());
-			} else if (jaxbElement.getValue() instanceof OrInnerType) {
-				negType.setOr((OrInnerType) jaxbElement.getValue());
-			} else if (jaxbElement.getValue() instanceof AtomType) {
+			if (jaxbElement.getValue() instanceof AtomType) {
 				negType.setAtom((AtomType) jaxbElement.getValue());
-			} else if (jaxbElement.getValue() instanceof ImpliesType) {
-				negType.setImplies((ImpliesType) jaxbElement.getValue());
-			} else if (jaxbElement.getValue() instanceof EquivalentType) {
-				negType.setEquivalent((EquivalentType) jaxbElement.getValue());
-			} else if (jaxbElement.getValue() instanceof ExistsType) {
-				negType.setExists((ExistsType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof EqualType) {
+				negType.setEqual((EqualType) jaxbElement.getValue());
 			}
 		}
 		return factory.createNeg(negType);
@@ -98,10 +91,10 @@ public class RuleMLBuilder {
 				existsType.setOr((OrInnerType) jaxbElement.getValue());
 			} else if (jaxbElement.getValue() instanceof AtomType) {
 				existsType.setAtom((AtomType) jaxbElement.getValue());
-			} else if (jaxbElement.getValue() instanceof ImpliesType) {
-				existsType.setImplies((ImpliesType) jaxbElement.getValue());
-			} else if (jaxbElement.getValue() instanceof EquivalentType) {
-				existsType.setEquivalent((EquivalentType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof NegType) {
+				existsType.setNeg((NegType) jaxbElement.getValue());
+			} else if (jaxbElement.getValue() instanceof EqualType) {
+				existsType.setEqual((EqualType) jaxbElement.getValue());
 			} else if (jaxbElement.getValue() instanceof ExistsType) {
 				existsType.setExists((ExistsType) jaxbElement.getValue());
 			}
@@ -174,7 +167,7 @@ public class RuleMLBuilder {
 
 	public String marshal(JAXBElement<RuleMLType> ruleML) {
 		try {
-			JAXBContext jContext = JAXBContext.newInstance("naffolog");
+			JAXBContext jContext = JAXBContext.newInstance("reactionruleml");
 			System.out.println("context ok");
 
 			Marshaller marshaller = jContext.createMarshaller();

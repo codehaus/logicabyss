@@ -6,26 +6,12 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
 
-import naffolog.AndInnerType;
-import naffolog.AssertType;
-import naffolog.AtomType;
-import naffolog.IfType;
-import naffolog.ImpliesType;
-import naffolog.IndType;
-import naffolog.OpAtomType;
-import naffolog.RelType;
-import naffolog.RuleMLType;
-import naffolog.SlotType;
-
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
-import org.drools.base.ClassFieldReader;
 import org.drools.base.ClassObjectType;
 import org.drools.builder.KnowledgeBuilder;
 import org.drools.builder.KnowledgeBuilderError;
@@ -34,16 +20,20 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.definition.KnowledgePackage;
 import org.drools.io.ResourceFactory;
-import org.drools.rule.Declaration;
 import org.drools.rule.GroupElement;
 import org.drools.rule.GroupElement.Type;
-import org.drools.rule.LiteralConstraint;
-import org.drools.rule.OrConstraint;
 import org.drools.rule.Pattern;
 import org.drools.rule.Rule;
-import org.drools.rule.VariableConstraint;
-import org.drools.spi.AlphaNodeFieldConstraint;
 
+import reactionruleml.AndInnerType;
+import reactionruleml.AssertType;
+import reactionruleml.IfType;
+import reactionruleml.ImpliesType;
+import reactionruleml.IndType;
+import reactionruleml.OpAtomType;
+import reactionruleml.RelType;
+import reactionruleml.RuleMLType;
+import reactionruleml.SlotType;
 import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator.PropertyInfo.ValueType;
 
 /**
@@ -338,7 +328,7 @@ public class Drools2RuleMLTranslator {
 			Object ind = slot.getValue().getContent().get(0).getValue();
 			if (ind instanceof IndType) {
 				IndType indType = (IndType) ind;
-				String property = indType.getContent().get(0);
+				String property = (String) indType.getContent().get(0);
 				// remove the slotted property from the list
 				properties.remove(property);
 			}

@@ -10,23 +10,24 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import naffolog.AndInnerType;
-import naffolog.AssertType;
-import naffolog.AtomType;
-import naffolog.IfType;
-import naffolog.ImpliesType;
-import naffolog.IndType;
-import naffolog.OpAtomType;
-import naffolog.OrInnerType;
-import naffolog.QueryType;
-import naffolog.RelType;
-import naffolog.RetractType;
-import naffolog.RuleMLType;
-import naffolog.SlotType;
-import naffolog.ThenType;
-import naffolog.VarType;
-
 import org.drools.io.ResourceFactory;
+
+import reactionruleml.AndInnerType;
+import reactionruleml.AssertType;
+import reactionruleml.AtomType;
+import reactionruleml.IfType;
+import reactionruleml.ImpliesType;
+import reactionruleml.IndType;
+import reactionruleml.OpAtomType;
+import reactionruleml.OrInnerType;
+import reactionruleml.QueryType;
+import reactionruleml.RelType;
+import reactionruleml.RetractType;
+import reactionruleml.RuleMLType;
+import reactionruleml.SlotType;
+import reactionruleml.ThenType;
+import reactionruleml.VarType;
+import ruleml.translator.ruleml2drl.DroolsBuilder.Rule;
 
 /**
  * Translator for RuleML intput to Drools DLR-source.
@@ -36,11 +37,14 @@ public class RuleML2DroolsTranslator {
 
 	private List<DrlPattern> whenPatterns = new ArrayList<DrlPattern>();
 	private List<DrlPattern> thenPatterns = new ArrayList<DrlPattern>();
-	private DrlPattern currentDlrPattern;
+	private DrlPattern currentDrlPattern;
 	private Object currentResult;
 	private List<String> boundVars = new ArrayList<String>();
 	private PartType currentPartType = PartType.IF;
-
+	private List<DroolsBuilder.Rule> rules = new ArrayList<DroolsBuilder.Rule>();
+	private DroolsBuilder.Rule currentRule;
+	private int ruleNumber = 1;
+	
 	// this type contains the both context state alternatives for RuleML (if, then)  
 	private enum PartType {
 		IF, THEN
@@ -112,7 +116,7 @@ public class RuleML2DroolsTranslator {
 	 */
 	public static RuleMLType readRuleML(String fileName) {
 		try {
-			JAXBContext jContext = JAXBContext.newInstance("naffolog");
+			JAXBContext jContext = JAXBContext.newInstance("reactionruleml");
 			Unmarshaller unmarshaller = jContext.createUnmarshaller();
 			JAXBElement<?> unmarshal = (JAXBElement<?>) unmarshaller
 					.unmarshal(ResourceFactory.newClassPathResource(fileName
@@ -141,8 +145,9 @@ public class RuleML2DroolsTranslator {
 		DroolsBuilder.Drl drl = new DroolsBuilder.Drl("org.ruleml.translator",
 				new String[] { "org.ruleml.translator.TestDataModel.*" });
 
-		drl.addRule("buy&Keep", translator.whenPatterns.toArray(),
-				translator.thenPatterns.toArray());
+		for (Rule rule: translator.rules) {
+			drl.addRule(rule);
+		}
 		
 		return drl.toString();
 	}
@@ -198,9 +203,9 @@ public class RuleML2DroolsTranslator {
 		dispatchType(atomType.getContent());
 		
 		if (currentPartType.equals(PartType.IF)) {
-			whenPatterns.add(currentDlrPattern);
+			whenPatterns.add(currentDrlPattern);
 		} else {
-			thenPatterns.add(currentDlrPattern);
+			thenPatterns.add(currentDrlPattern);
 		}
 
 		return null;
@@ -209,36 +214,42 @@ public class RuleML2DroolsTranslator {
 	private void processSlot(SlotType slotType) {
 		List<JAXBElement<?>> content = slotType.getContent();
 
-		// process the var
-		dispatchType(content.get(1).getValue());
-
-		// get the temp result
-		String temp = (String) currentResult;
-
-		// process the ind
-		dispatchType(content.get(0).getValue());
-
+		// get the slot name
+		String slotName = (String) ((IndType)content.get(0).getValue()).getContent().get(0);
+		
+		// get the slot value
+		String slotValue = "";
+		String rawSlotValue = "";
+		
+		// check if variable (var) or constant(ind)
+		if (content.get(1).getValue() instanceof VarType) {
+			rawSlotValue = ((VarType)content.get(1).getValue()).getContent().get(0);
+			slotValue = "$"+rawSlotValue;
+		} else if (content.get(1).getValue() instanceof IndType) {
+			rawSlotValue = (String) ((IndType)content.get(1).getValue()).getContent().get(0);
+			slotValue = "\"" + rawSlotValue + "\"";  
+		}
+		
 		// check the current context part (IF or THEN)
 		if (currentPartType.equals(PartType.IF)) {
-			if (currentDlrPattern != null) {
-				// check if the var was already bound
-				if (boundVars.contains(temp)) {
-					currentDlrPattern.addComponent(currentResult + "==" + "$"
-							+ temp);
+			if (currentDrlPattern != null) {
+				// check if the var was already bound 
+				if (boundVars.contains(rawSlotValue)) {
+					// set the pattern property ( buyer == $person)
+					currentDrlPattern.addComponent(slotName + "==" + slotValue);
 				} else {
-					// set the pattern property
-					currentDlrPattern.addComponent("$" + temp + ":"
-							+ currentResult);
+					// set the pattern property ( $person : buyer)
+					currentDrlPattern.addComponent(slotValue + ":" + slotName);
 					// bind the var
-					boundVars.add(temp);
+					boundVars.add(rawSlotValue);
 				}
 			} else {
 				System.out.println("Error, pattern not initiated !!!");
 			}
 		} else {
-			if (currentDlrPattern != null) {
-				currentDlrPattern.addComponent("$" + temp);
-				currentDlrPattern.setPrefix("insert");
+			if (currentDrlPattern != null) {
+				currentDrlPattern.addComponent(slotValue);
+				currentDrlPattern.setPrefix("insert");
 			} else {
 				System.out.println("Error, pattern not initiated !!!");
 			}
@@ -251,7 +262,7 @@ public class RuleML2DroolsTranslator {
 	}
 
 	private void processInd(IndType indType) {
-		List<String> content = indType.getContent();
+		List<Object> content = indType.getContent();
 		currentResult = content.get(0);
 	}
 
@@ -261,7 +272,7 @@ public class RuleML2DroolsTranslator {
 
 	private void processRel(RelType relType) {
 		String relName = relType.getContent().get(0);
-		currentDlrPattern = new DrlPattern(relName);
+		currentDrlPattern = new DrlPattern(relName);
 	}
 
 	private void processAnd(AndInnerType andType) {
@@ -298,7 +309,33 @@ public class RuleML2DroolsTranslator {
 	}
 
 	private void processAssert(AssertType assertType) {
-		dispatchType( assertType.getFormulaOrRulebaseOrAtom() );
+		List<Object> formulaOrRulebaseOrAtom = assertType.getFormulaOrRulebaseOrAtom();
+		currentRule = new Rule();
+		
+		for (Object o : formulaOrRulebaseOrAtom) {
+			// create a empty rule
+			currentRule = new Rule();
+			
+			// forward
+			dispatchType(o);
+
+			// add the current rule to the list with rules
+			if (currentRule != null) {
+				currentRule.setRuleName("rule" + this.ruleNumber++ );
+				if (this.whenPatterns.isEmpty()) {
+					currentRule.setWhenPart(new String[] {"eval(true)"});
+				} else {
+					currentRule.setWhenPart(this.whenPatterns.toArray());
+				}
+				currentRule.setThenPart(this.thenPatterns.toArray());
+				rules.add(currentRule);
+				
+				// reset the patterns
+				this.whenPatterns.clear();
+				this.thenPatterns.clear();
+			}
+			
+		}
 	}
 	
 	private void processRetract(RetractType retractType) {
