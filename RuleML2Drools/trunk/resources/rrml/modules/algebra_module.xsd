@@ -456,7 +456,16 @@ targetNamespace="http://www.ruleml.org/1.0/xsd" elementFormDefault="qualified">
 		<xs:group ref="Interval.content"/>
 		<xs:attributeGroup ref="Interval.attlist"/>
 	</xs:complexType>
-	<xs:element name="Interval" type="Interval.type"/>
+
+	<xs:element name="Interval" type="Interval.type">
+		<xs:annotation>
+      		<xs:appinfo>
+         		<jxb:class name="IntervalSuper"/>
+				<jxb:property name="IntervalSuper"/>
+      		</xs:appinfo>
+		</xs:annotation>
+	
+	</xs:element>
 
 <!--
      *** interval_group.content ***
