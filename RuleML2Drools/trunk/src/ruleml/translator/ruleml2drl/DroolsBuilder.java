@@ -14,9 +14,18 @@ public class DroolsBuilder {
 	public static final void main(String[] args) {
 		Drl drl = new Drl("com.simple", new String[] {
 				"com.sample.TestDataModel.*", "asdfd.sss" });
-		drl.addRule("test", new String[] {"........"}, new String[] {"---------"});
-		drl.addRule("test", new String[] {"!!!!!!!!!"}, new String[] {"---------"});
-
+		
+		Rule rule = new Rule();
+		rule.setRuleName("test");
+		rule.setWhenPart(new String[] {"........"});
+		rule.setThenPart(new String[] {"---------"});
+		drl.addRule(rule);
+		
+		rule.setRuleName("test");
+		rule.setWhenPart(new String[] {"!!!!!!!!!"});
+		rule.setThenPart(new String[] {"---------"});
+		drl.addRule(rule);
+		
 		System.out.println(drl);
 	}
 
@@ -34,9 +43,17 @@ public class DroolsBuilder {
 			this.imports = imports;
 		}
 
-		public void addRule(String ruleName, Object[] whenPart,
+		public void createRule(String ruleName, Object[] whenPart,
 				Object[] thenPart) {
-			rules.add(new Rule(ruleName, whenPart, thenPart));
+			Rule rule = new Rule();
+			rule.setRuleName(ruleName);
+			rule.setWhenPart(whenPart);
+			rule.setThenPart(thenPart);
+			rules.add(rule);
+		}
+		
+		public void addRule (Rule rule) {
+			rules.add(rule);
 		}
 
 		@Override
@@ -63,18 +80,36 @@ public class DroolsBuilder {
 
 	public static class Rule {
 		private String ruleName;
+		public String getRuleName() {
+			return ruleName;
+		}
+
+		public void setRuleName(String ruleName) {
+			this.ruleName = ruleName;
+		}
+
+		public Object[] getWhenPart() {
+			return whenPart;
+		}
+
+		public void setWhenPart(Object[] whenPart) {
+			this.whenPart = whenPart;
+		}
+
+		public Object[] getThenPart() {
+			return thenPart;
+		}
+
+		public void setThenPart(Object[] thenPart) {
+			this.thenPart = thenPart;
+		}
+
 		private Object[] whenPart;
 		private Object[] thenPart;
 
 		private static String rulePattern = "rule \"#rulename#\"\n"
 				+ "\twhen\n" + "#whenpart#\n" + "\tthen\n" + "#thenpart#\n"
 				+ "end\n";
-
-		public Rule(String ruleName, Object[] whenPart, Object[] thenPart) {
-			this.ruleName = ruleName;
-			this.whenPart = whenPart;
-			this.thenPart = thenPart;
-		}
 
 		@Override
 		public String toString() {

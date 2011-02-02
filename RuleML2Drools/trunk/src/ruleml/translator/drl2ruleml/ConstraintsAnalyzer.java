@@ -8,11 +8,11 @@ import java.util.Random;
 
 import javax.xml.bind.JAXBElement;
 
-import naffolog.AtomType;
-import naffolog.IndType;
-import naffolog.OpAtomType;
-import naffolog.RelType;
-import naffolog.VarType;
+import reactionruleml.AtomType;
+import reactionruleml.IndType;
+import reactionruleml.OpAtomType;
+import reactionruleml.RelType;
+import reactionruleml.VarType;
 
 import org.drools.base.ClassFieldReader;
 import org.drools.base.evaluators.ComparableEvaluatorsDefinition.IntegerGreaterEvaluator;
