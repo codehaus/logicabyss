@@ -446,12 +446,12 @@
 		</xs:sequence>
 	</xs:group>
 	<xs:complexType name="Interval.type">
-		<xsd:annotation>
-      		<xsd:appinfo>
+		<xs:annotation>
+      		<xs:appinfo>
          		<jxb:class name="IntervalSuperType">
          		</jxb:class>
-      		</xsd:appinfo>
-
+      		</xs:appinfo>
+		</xs:annotation>
 		<xs:group ref="Interval.content"/>
 		<xs:attributeGroup ref="Interval.attlist"/>
 	</xs:complexType>
