@@ -94,7 +94,6 @@ targetNamespace="http://www.ruleml.org/1.0/xsd" elementFormDefault="qualified">
 	<xs:element name="interval" type="interval.type">
 			<xs:annotation>
       		<xs:appinfo>
-         		<jxb:class name="IntervalSuper"/>
 				<jxb:property name="IntervalSuper"/>
       		</xs:appinfo>
 		</xs:annotation>	
