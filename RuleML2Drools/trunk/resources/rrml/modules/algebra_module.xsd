@@ -67,6 +67,7 @@
 	  *** interval ***
 
 	  content model: ( Interval | Plex | Var )
+-->
 
 <xs:attributeGroup name="interval.attlist"/>
 	<xs:group name="interval.content">
@@ -84,7 +85,6 @@
 	</xs:complexType>
 	<xs:element name="interval" type="interval.type"/>
 	
--->
 	
 	
 <xs:group name="action_algebra_group.content">
@@ -435,7 +435,6 @@
                 | Disjunction | Xor | Conjunction | Concurrent | Not | Any | Aperiodic 
                 | Periodic , on |  Naf | Neg | Atom | Rule | Message |  time | Ind | Var | Expr | Sequence | Disjunction | 
                 Xor | Conjunction | Concurrent | Not | Any | Aperiodic | Periodic)
--->	
 
 <xs:attributeGroup name="Interval.attlist"/>
 	<xs:group name="Interval.content">
@@ -450,6 +449,7 @@
 		<xs:attributeGroup ref="Interval.attlist"/>
 	</xs:complexType>
 	<xs:element name="Interval" type="Interval.type"/>
+-->	
 
 <!--
      *** interval_group.content ***
