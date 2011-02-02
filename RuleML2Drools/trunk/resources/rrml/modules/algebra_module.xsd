@@ -67,7 +67,6 @@
 	  *** interval ***
 
 	  content model: ( Interval | Plex | Var )
--->
 
 <xs:attributeGroup name="interval.attlist"/>
 	<xs:group name="interval.content">
@@ -85,6 +84,7 @@
 	</xs:complexType>
 	<xs:element name="interval" type="interval.type"/>
 	
+-->
 	
 	
 <xs:group name="action_algebra_group.content">
