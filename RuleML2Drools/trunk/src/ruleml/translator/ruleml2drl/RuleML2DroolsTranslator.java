@@ -24,6 +24,7 @@ import reactionruleml.QueryType;
 import reactionruleml.RelType;
 import reactionruleml.RetractType;
 import reactionruleml.RuleMLType;
+import reactionruleml.RuleType;
 import reactionruleml.SlotType;
 import reactionruleml.ThenType;
 import reactionruleml.VarType;
@@ -31,6 +32,7 @@ import ruleml.translator.ruleml2drl.DroolsBuilder.Rule;
 
 /**
  * Translator for RuleML intput to Drools DLR-source.
+ * 
  * @author Jabarski
  */
 public class RuleML2DroolsTranslator {
@@ -40,16 +42,18 @@ public class RuleML2DroolsTranslator {
 	private DrlPattern currentDrlPattern;
 	private Object currentResult;
 	private List<String> boundVars = new ArrayList<String>();
-	private PartType currentPartType = PartType.IF;
+	private PartType currentPartType = PartType.WHEN;
 	private List<DroolsBuilder.Rule> rules = new ArrayList<DroolsBuilder.Rule>();
 	private DroolsBuilder.Rule currentRule;
 	private int ruleNumber = 1;
-	
-	// this type contains the both context state alternatives for RuleML (if, then)  
+
+	// contains the both context state alternatives for Drools source
+	// (when,then)
 	private enum PartType {
-		IF, THEN
+		WHEN, THEN
 	}
 
+	// Representation for the drools pattern
 	public static class DrlPattern {
 		enum RelComponentType {
 			IND, VAR, DATA
@@ -111,7 +115,9 @@ public class RuleML2DroolsTranslator {
 
 	/**
 	 * Method to read ruleml 1.0 resource.
-	 * @param fileName The name of the resource.
+	 * 
+	 * @param fileName
+	 *            The name of the resource.
 	 * @return The JAXB parent type for the ruleml 1.0 object model.
 	 */
 	public static RuleMLType readRuleML(String fileName) {
@@ -119,8 +125,8 @@ public class RuleML2DroolsTranslator {
 			JAXBContext jContext = JAXBContext.newInstance("reactionruleml");
 			Unmarshaller unmarshaller = jContext.createUnmarshaller();
 			JAXBElement<?> unmarshal = (JAXBElement<?>) unmarshaller
-					.unmarshal(ResourceFactory.newClassPathResource(fileName
-							).getInputStream());
+					.unmarshal(ResourceFactory.newClassPathResource(fileName)
+							.getInputStream());
 			RuleMLType ruleMLType = (RuleMLType) unmarshal.getValue();
 			return ruleMLType;
 		} catch (JAXBException e) {
@@ -133,9 +139,10 @@ public class RuleML2DroolsTranslator {
 	}
 
 	/**
-	 * The entry point of the translation. This will start translation and returns
-	 * the dlr-source output.
-	 * @return Dlr-Source 
+	 * The entry point of the translation. This will start translation and
+	 * returns the dlr-source output.
+	 * 
+	 * @return Dlr-Source
 	 */
 	public static String translate(RuleMLType ruleML) {
 		RuleML2DroolsTranslator translator = new RuleML2DroolsTranslator();
@@ -145,17 +152,19 @@ public class RuleML2DroolsTranslator {
 		DroolsBuilder.Drl drl = new DroolsBuilder.Drl("org.ruleml.translator",
 				new String[] { "org.ruleml.translator.TestDataModel.*" });
 
-		for (Rule rule: translator.rules) {
+		for (Rule rule : translator.rules) {
 			drl.addRule(rule);
 		}
-		
+
 		return drl.toString();
 	}
-	
+
 	/**
 	 * The main method for the dispatching of ruleml types within a translation.
-	 * @param value The RuleML type to be transformed: in the most cases this will
-	 * be RuleMLType, but also other subtypes can be transformed. 
+	 * 
+	 * @param value
+	 *            The RuleML type to be transformed: in the most cases this will
+	 *            be RuleMLType, but also other subtypes can be transformed.
 	 */
 	private void dispatchType(Object value) {
 		if (value instanceof SlotType) {
@@ -180,6 +189,8 @@ public class RuleML2DroolsTranslator {
 			processQuery((QueryType) value);
 		} else if (value instanceof ImpliesType) {
 			processImplies((ImpliesType) value);
+		} else if (value instanceof RuleType) {
+			processRule((RuleType) value);
 		} else if (value instanceof AtomType) {
 			processAtom((AtomType) value);
 		} else if (value instanceof AndInnerType) {
@@ -187,13 +198,13 @@ public class RuleML2DroolsTranslator {
 		} else if (value instanceof OrInnerType) {
 			processOr((OrInnerType) value);
 		} else if (value instanceof RuleMLType) {
-			processRuleML ((RuleMLType)value);
+			processRuleML((RuleMLType) value);
 		} else if (value instanceof List) {
-			for (Object o : (List)value) {
+			for (Object o : (List) value) {
 				dispatchType(o);
 			}
 		} else if (value instanceof JAXBElement<?>) {
-			dispatchType(((JAXBElement<?>)value).getValue());
+			dispatchType(((JAXBElement<?>) value).getValue());
 		}
 	}
 
@@ -201,8 +212,8 @@ public class RuleML2DroolsTranslator {
 
 	private DrlPattern processAtom(AtomType atomType) {
 		dispatchType(atomType.getContent());
-		
-		if (currentPartType.equals(PartType.IF)) {
+
+		if (currentPartType.equals(PartType.WHEN)) {
 			whenPatterns.add(currentDrlPattern);
 		} else {
 			thenPatterns.add(currentDrlPattern);
@@ -215,26 +226,29 @@ public class RuleML2DroolsTranslator {
 		List<JAXBElement<?>> content = slotType.getContent();
 
 		// get the slot name
-		String slotName = (String) ((IndType)content.get(0).getValue()).getContent().get(0);
-		
+		String slotName = (String) ((IndType) content.get(0).getValue())
+				.getContent().get(0);
+
 		// get the slot value
 		String slotValue = "";
 		String rawSlotValue = "";
-		
+
 		// check if variable (var) or constant(ind)
 		if (content.get(1).getValue() instanceof VarType) {
-			rawSlotValue = ((VarType)content.get(1).getValue()).getContent().get(0);
-			slotValue = "$"+rawSlotValue;
+			rawSlotValue = ((VarType) content.get(1).getValue()).getContent()
+					.get(0);
+			slotValue = "$" + rawSlotValue;
 		} else if (content.get(1).getValue() instanceof IndType) {
-			rawSlotValue = (String) ((IndType)content.get(1).getValue()).getContent().get(0);
-			slotValue = "\"" + rawSlotValue + "\"";  
+			rawSlotValue = (String) ((IndType) content.get(1).getValue())
+					.getContent().get(0);
+			slotValue = "\"" + rawSlotValue + "\"";
 		}
-		
-		// check the current context part (IF or THEN)
-		if (currentPartType.equals(PartType.IF)) {
+
+		if (currentPartType.equals(PartType.WHEN)) {
+			// current context part = WHEN
 			if (currentDrlPattern != null) {
-				// check if the var was already bound 
-				if (boundVars.contains(rawSlotValue)) {
+				// check if the var was already bound
+				if (boundVars.contains(rawSlotValue) || content.get(1).getValue() instanceof IndType) {
 					// set the pattern property ( buyer == $person)
 					currentDrlPattern.addComponent(slotName + "==" + slotValue);
 				} else {
@@ -247,9 +261,9 @@ public class RuleML2DroolsTranslator {
 				System.out.println("Error, pattern not initiated !!!");
 			}
 		} else {
+			// current context part = THEN
 			if (currentDrlPattern != null) {
 				currentDrlPattern.addComponent(slotValue);
-				currentDrlPattern.setPrefix("insert");
 			} else {
 				System.out.println("Error, pattern not initiated !!!");
 			}
@@ -280,11 +294,11 @@ public class RuleML2DroolsTranslator {
 	}
 
 	private void processOr(OrInnerType orType) {
-		dispatchType( orType.getFormulaOrAtomOrAnd());
+		dispatchType(orType.getFormulaOrAtomOrAnd());
 	}
 
 	private void processIf(IfType ifType) {
-		currentPartType = PartType.IF;
+		currentPartType = PartType.WHEN;
 
 		if (ifType.getAnd() != null) {
 			dispatchType(ifType.getAnd());
@@ -308,45 +322,87 @@ public class RuleML2DroolsTranslator {
 		dispatchType(impliesType.getContent());
 	}
 
+	private void processRule(RuleType ruleType) {
+		dispatchType(ruleType.getContent());
+	}
+
 	private void processAssert(AssertType assertType) {
-		List<Object> formulaOrRulebaseOrAtom = assertType.getFormulaOrRulebaseOrAtom();
+		List<Object> formulaOrRulebaseOrAtom = assertType
+				.getFormulaOrRulebaseOrAtom();
 		currentRule = new Rule();
-		
+
 		for (Object o : formulaOrRulebaseOrAtom) {
 			// create a empty rule
 			currentRule = new Rule();
-			
+
 			// forward
 			dispatchType(o);
 
 			// add the current rule to the list with rules
 			if (currentRule != null) {
-				currentRule.setRuleName("rule" + this.ruleNumber++ );
+				currentRule.setRuleName("rule" + this.ruleNumber++);
 				if (this.whenPatterns.isEmpty()) {
-					currentRule.setWhenPart(new String[] {"eval(true)"});
+					currentRule.setWhenPart(new String[] { "eval(true)" });
 				} else {
 					currentRule.setWhenPart(this.whenPatterns.toArray());
 				}
+				
+				processThenPatterns ("insert");
+				
 				currentRule.setThenPart(this.thenPatterns.toArray());
 				rules.add(currentRule);
-				
+
 				// reset the patterns
 				this.whenPatterns.clear();
 				this.thenPatterns.clear();
 			}
-			
+
+		}
+	}
+
+	private void processRetract(RetractType retractType) {
+		List<Object> formulaOrRulebaseOrAtom = retractType.getFormulaOrRulebaseOrAtom();
+		currentRule = new Rule();
+
+		for (Object o : formulaOrRulebaseOrAtom) {
+			// create a empty rule
+			currentRule = new Rule();
+
+			// forward
+			dispatchType(o);
+
+			// add the current rule to the list with rules
+			if (currentRule != null) {
+				currentRule.setRuleName("rule" + this.ruleNumber++);
+				if (this.whenPatterns.isEmpty()) {
+					currentRule.setWhenPart(new String[] { "eval(true)" });
+				} else {
+					currentRule.setWhenPart(this.whenPatterns.toArray());
+				}
+				
+				processThenPatterns ("retract");
+				
+				currentRule.setThenPart(this.thenPatterns.toArray());
+				rules.add(currentRule);
+
+				// reset the patterns
+				this.whenPatterns.clear();
+				this.thenPatterns.clear();
+			}
+		}
+	}
+
+	private void processThenPatterns (String prefix) {
+		for (DrlPattern pattern : this.thenPatterns) {
+			pattern.setPrefix(prefix);
 		}
 	}
 	
-	private void processRetract(RetractType retractType) {
-		dispatchType( retractType.getFormulaOrRulebaseOrAtom() );
-	}
-	
 	private void processQuery(QueryType queryType) {
-		dispatchType( queryType.getFormulaOrRulebaseOrAtom() );
+		dispatchType(queryType.getFormulaOrRulebaseOrAtom());
 	}
-	
+
 	private void processRuleML(RuleMLType value) {
-		dispatchType( value.getAssertOrRetractOrQuery() );
+		dispatchType(value.getAssertOrRetractOrQuery());
 	}
 }

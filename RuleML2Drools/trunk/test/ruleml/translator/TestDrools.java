@@ -21,7 +21,8 @@ public class TestDrools {
 		try {
 			// read the ruleml file
 			RuleMLType ruleML = RuleML2DroolsTranslator
-					.readRuleML("ruleml/own_slotted.xml");
+//					.readRuleML("ruleml/own_slotted.xml");
+					.readRuleML("ruleml/DerivationRule.rrml");
 
 			String drl = RuleML2DroolsTranslator.translate(ruleML);
 
