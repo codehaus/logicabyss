@@ -9,12 +9,46 @@ import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.junit.Test;
 
+import ruleml.translator.TestDataModel.Buy;
+import ruleml.translator.TestDataModel.Keep;
 import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator;
 import ruleml.translator.ruleml2drl.RuleML2DroolsTranslator;
 
 public class TestDrools {
 
 	@Test
+	public void test1 () {
+		try {
+			// load up the knowledge base
+			KnowledgeBase kbase = Drools2RuleMLTranslator
+					.readKnowledgeBase("drools/test.drl");
+			StatefulKnowledgeSession ksession = kbase
+					.newStatefulKnowledgeSession();
+			KnowledgeRuntimeLogger logger = KnowledgeRuntimeLoggerFactory
+					.newFileLogger(ksession, "test");
+
+			Buy buy1 = new Buy("Ti6o", "Dealer", "Objective");
+			Buy buy2 = new Buy("Margo", "Amazon", "USB");
+			Keep keep = new Keep("Ti6o", "Objective");
+
+			ksession.insert(buy1);
+			ksession.insert(buy2);
+			ksession.insert(keep);
+
+			System.out.println(ksession.getFactCount());
+
+			ksession.fireAllRules();
+
+			System.out.println(ksession.getFactCount());
+			
+			logger.close();
+		} catch (Throwable t) {
+			t.printStackTrace();
+			fail();
+		}		
+	}
+	
+//	@Test
 	public void testRuleML2Drools_1() {
 		System.out
 				.println("***********************   RuleML -> Drl  **************************");

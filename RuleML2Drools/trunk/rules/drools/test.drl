@@ -12,6 +12,13 @@ then
 end
 
 
+rule "test_retract"
+when
+	$B : Buy (buyer=="Ti6o", seller=="Dealer", item=="Objective");
+then
+	retract ($B);
+end
+
 /**
 rule "rule2"
 when
