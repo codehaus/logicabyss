@@ -14,7 +14,6 @@ import reactionruleml.AndInnerType;
 import reactionruleml.AssertType;
 import reactionruleml.AtomType;
 import reactionruleml.EqualType;
-import reactionruleml.EquivalentType;
 import reactionruleml.ExistsType;
 import reactionruleml.IfType;
 import reactionruleml.ImpliesType;
@@ -168,11 +167,8 @@ public class RuleMLBuilder {
 	public String marshal(JAXBElement<RuleMLType> ruleML) {
 		try {
 			JAXBContext jContext = JAXBContext.newInstance("reactionruleml");
-			System.out.println("context ok");
 
 			Marshaller marshaller = jContext.createMarshaller();
-
-			System.out.println("marshaller  ready");
 
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
 					Boolean.TRUE);
