@@ -33,7 +33,7 @@ public class TestDrools {
 		}
 	}
 
-	@Test
+//	@Test
 	public void testDrools2RuleML_1() {
 		System.out
 				.println("*************************   Drl -> RuleML ************************");
