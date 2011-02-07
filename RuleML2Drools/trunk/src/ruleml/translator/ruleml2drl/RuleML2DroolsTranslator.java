@@ -13,6 +13,7 @@ import javax.xml.bind.Unmarshaller;
 import org.drools.io.ResourceFactory;
 
 import reactionruleml.AndInnerType;
+import reactionruleml.AndQueryType;
 import reactionruleml.AssertType;
 import reactionruleml.AtomType;
 import reactionruleml.IfType;
@@ -100,8 +101,12 @@ public class RuleML2DroolsTranslator {
 		public String toString() {
 			StringBuffer sb = new StringBuffer();
 
-			if (getPrefix() != null && getVariable() == null) {
+			if (getPrefix() != null) {
 				sb.append(prefix + "( new ");
+			}
+			
+			if (getVariable() != null) {
+				sb.append(variable + ": ");
 			}
 
 			sb.append(className).append("(");
@@ -121,7 +126,6 @@ public class RuleML2DroolsTranslator {
 
 			return sb.toString();
 		}
-
 	}
 
 	/**
@@ -206,6 +210,8 @@ public class RuleML2DroolsTranslator {
 			currentProcessor.processAtom((AtomType) value);
 		} else if (value instanceof AndInnerType) {
 			currentProcessor.processAnd((AndInnerType) value);
+		} else if (value instanceof AndQueryType) {
+			currentProcessor.processAnd((AndQueryType) value);			
 		} else if (value instanceof OrInnerType) {
 			currentProcessor.processOr((OrInnerType) value);
 		} else if (value instanceof RuleMLType) {

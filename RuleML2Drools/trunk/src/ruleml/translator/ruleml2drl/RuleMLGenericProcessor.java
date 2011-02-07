@@ -6,6 +6,7 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 
 import reactionruleml.AndInnerType;
+import reactionruleml.AndQueryType;
 import reactionruleml.AssertType;
 import reactionruleml.AtomType;
 import reactionruleml.IfType;
@@ -30,15 +31,14 @@ public class RuleMLGenericProcessor {
 	protected DrlPattern currentDrlPattern;
 	protected List<String> boundVars = new ArrayList<String>();
 	protected PartType currentContext = PartType.WHEN;
-	protected DroolsBuilder.Rule currentRule;
 	protected static int ruleNumber = 1;
 
 	protected RuleML2DroolsTranslator translator;
-	
-	public RuleMLGenericProcessor (RuleML2DroolsTranslator translator) {
+
+	public RuleMLGenericProcessor(RuleML2DroolsTranslator translator) {
 		this.translator = translator;
 	}
-	
+
 	/*********************** Methods to process single RuleML elements ****************/
 
 	public DrlPattern processAtom(AtomType atomType) {
@@ -121,6 +121,10 @@ public class RuleMLGenericProcessor {
 	}
 
 	public void processAnd(AndInnerType andType) {
+		translator.dispatchType(andType.getFormulaOrAtomOrAnd());
+	}
+
+	public void processAnd(AndQueryType andType) {
 		translator.dispatchType(andType.getFormulaOrAtomOrAnd());
 	}
 

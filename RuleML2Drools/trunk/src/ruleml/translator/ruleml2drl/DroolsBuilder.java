@@ -3,6 +3,8 @@ package ruleml.translator.ruleml2drl;
 import java.util.ArrayList;
 import java.util.List;
 
+import ruleml.translator.ruleml2drl.DroolsBuilder.Query;
+
 public class DroolsBuilder {
 	private static final String NAME = "#rulename#";
 	private static final String WHEN_PART = "#whenpart#";
@@ -121,6 +123,10 @@ public class DroolsBuilder {
 
 
 			return result;
+		}
+
+		public void addQuery(Query query) {
+			this.queries.add(query);
 		}
 	}
 

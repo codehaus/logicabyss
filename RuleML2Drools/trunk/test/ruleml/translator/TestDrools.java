@@ -16,7 +16,7 @@ import ruleml.translator.ruleml2drl.RuleML2DroolsTranslator;
 
 public class TestDrools {
 
-	@Test
+//	@Test
 	public void test1 () {
 		try {
 			// load up the knowledge base
@@ -48,7 +48,7 @@ public class TestDrools {
 		}		
 	}
 	
-//	@Test
+	@Test
 	public void testRuleML2Drools_1() {
 		System.out
 				.println("***********************   RuleML -> Drl  **************************");
