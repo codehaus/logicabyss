@@ -56,6 +56,18 @@
 	</Assert>
 
 	<Query>
+	 <And>
+		<Atom>
+			<Rel>person</Rel>
+			<slot>
+				<Ind>name</Ind>
+				<Ind>John</Ind>
+			</slot>
+			<slot>
+				<Ind>age</Ind>
+				<Ind>25</Ind>
+			</slot>
+		</Atom>
 		<Atom>
 			<Rel>likes</Rel>
 			<slot>
@@ -67,6 +79,7 @@
 				<Ind>whom</Ind>
 			</slot>
 		</Atom>
+	 </And>
 	</Query>
 
 	<Retract>
