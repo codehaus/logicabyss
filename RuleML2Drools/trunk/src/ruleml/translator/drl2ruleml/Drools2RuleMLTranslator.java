@@ -6,10 +6,18 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
+import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
 import org.drools.base.ClassObjectType;
@@ -20,15 +28,20 @@ import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
 import org.drools.definition.KnowledgePackage;
 import org.drools.io.ResourceFactory;
+import org.drools.lang.descr.PackageDescr;
+import org.drools.lang.descr.RuleDescr;
 import org.drools.rule.GroupElement;
 import org.drools.rule.GroupElement.Type;
 import org.drools.rule.Pattern;
 import org.drools.rule.Rule;
+import org.drools.rule.builder.dialect.java.JavaAnalysisResult;
+import org.drools.rule.builder.dialect.java.parser.JavaLexer;
+import org.drools.rule.builder.dialect.java.parser.JavaLocalDeclarationDescr;
+import org.drools.rule.builder.dialect.java.parser.JavaParser;
 
 import reactionruleml.AndInnerType;
-import reactionruleml.AssertType;
+import reactionruleml.DoType;
 import reactionruleml.IfType;
-import reactionruleml.ImpliesType;
 import reactionruleml.IndType;
 import reactionruleml.OpAtomType;
 import reactionruleml.RelType;
@@ -42,6 +55,13 @@ import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator.PropertyInfo.ValueTy
  * @author Jabarski
  */
 public class Drools2RuleMLTranslator {
+
+	// This are the possible types for a rule or query in drools
+	private enum DroolsRuleType {
+		ASSERT, RETRACT, QUERY;
+	}
+
+	private DroolsRuleType currentRuleType = DroolsRuleType.ASSERT;
 
 	public static RuleMLBuilder builder = new RuleMLBuilder();
 
@@ -134,9 +154,11 @@ public class Drools2RuleMLTranslator {
 	 * 
 	 * @param kbase
 	 *            The knowledge base
+	 * @param pkgDescr
+	 *            The output of the drools parser in raw form
 	 * @return Serialized RuleML
 	 */
-	public static String translate(KnowledgeBase kbase) {
+	public static String translate(KnowledgeBase kbase, PackageDescr pkgDescr) {
 		Drools2RuleMLTranslator translator = new Drools2RuleMLTranslator();
 
 		String result = "";
@@ -156,35 +178,117 @@ public class Drools2RuleMLTranslator {
 						rule.getName());
 				// get the root group element
 				GroupElement[] transformedLhs = rule_.getTransformedLhs();
+
+				// process the right hand side (RHS or Then part) and set the
+				// type
+				JAXBElement<?> thenPart = translator.processThenPart(pkgDescr);
+
 				// transform the rule
-				JAXBElement<?> element = translator
+				JAXBElement<?> whenPart = translator
 						.processGroupElement(transformedLhs[0]);
 
-				result += translator.wrapElement(element)
+				result += translator.wrapElement(whenPart, thenPart)
 						+ "\n*********************************************************\n";
 			}
 		}
 		return result;
 	}
 
+	private JAXBElement<?> processThenPart(PackageDescr pkgDescr) {
+		// get the first rule
+		RuleDescr ruleDescr = pkgDescr.getRules().get(0);
+		String consequence = (String) ruleDescr.getConsequence();
+
+		// parse the consequence
+		consequence = consequence.trim();
+		System.out.println(consequence);
+
+		if (consequence.startsWith("insert")) {
+			// rule type is assert
+
+		} else if (consequence.startsWith("retract")) {
+			// rule type is retract
+
+		} else {
+			throw new IllegalArgumentException(
+					"Could not get the type of the then part (only insert or retract permitted)");
+		}
+
+		// rule type is query
+		String s = "assert(new Own($person,$object, \"ttt\"))";
+
+		final CharStream charStream = new ANTLRStringStream(s);
+		final JavaLexer lexer = new JavaLexer(charStream);
+		final TokenStream tokenStream = new CommonTokenStream(lexer);
+		final JavaParser parser = new JavaParser(tokenStream);
+
+		try {
+			parser.primary();
+		} catch (RecognitionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		JavaAnalysisResult result = new JavaAnalysisResult();
+		result.setIdentifiers(parser.getIdentifiers());
+		
+		result.setLocalVariables(new HashMap<String, JavaLocalDeclarationDescr>());
+		for (Iterator it = parser.getLocalDeclarations().iterator(); it
+				.hasNext();) {
+			JavaLocalDeclarationDescr descr = (JavaLocalDeclarationDescr) it
+					.next();
+			for (Iterator identIt = descr.getIdentifiers().iterator(); identIt
+					.hasNext();) {
+				JavaLocalDeclarationDescr.IdentifierDescr ident = (JavaLocalDeclarationDescr.IdentifierDescr) identIt
+						.next();
+				result.addLocalVariable(ident.getIdentifier(), descr);
+			}
+		}
+		result.setBlockDescrs(parser.getBlockDescr());
+		
+		
+//		for (int i =0; i<tokenStream.size();i++) {
+//			Token token = tokenStream.get(i);
+//			System.out.println(token);
+//		}
+		
+//		return analyze(result, availableIdentifiers);
+
+		return null;
+	}
+
 	/**
 	 * Creates the wrapper on the group element
 	 * 
-	 * @param element
-	 *            The main group elelemnt of the Drools-LHS
+	 * @param whenPart
+	 *            The when part of the drools source (LHS)
+	 * @param thenPart
+	 *            The then part of the drools source (RHS)
 	 * @return Serialized RuleML
 	 */
-	private String wrapElement(JAXBElement<?> element) {
-		// create the wrapper for the current use case ( RuleML -> Assert ->
-		// Implies -> If)
+	private String wrapElement(JAXBElement<?> whenPart, JAXBElement<?> thenPart) {
+		// create the wrapper for the current use case ( RuleML ->
+		// Assert/Retract/Query ->
+		// If , Do)
 		JAXBElement<IfType> ifType = builder
-				.createIf(new JAXBElement<?>[] { element });
-		JAXBElement<ImpliesType> implies = builder
-				.createImplies(new JAXBElement<?>[] { ifType });
-		JAXBElement<AssertType> assertType = builder
-				.createAssert(new JAXBElement<?>[] { implies });
+				.createIf(new JAXBElement<?>[] { whenPart });
+		JAXBElement<DoType> doType = builder
+				.createDo(new JAXBElement<?>[] { thenPart });
+
+		JAXBElement<?> ruleMLContent = null;
+		if (currentRuleType == DroolsRuleType.ASSERT) {
+			ruleMLContent = builder.createAssert(new JAXBElement<?>[] { ifType,
+					doType });
+		} else if (currentRuleType == DroolsRuleType.RETRACT) {
+			ruleMLContent = builder.createRetract(new JAXBElement<?>[] {
+					ifType, doType });
+		} else if (currentRuleType == DroolsRuleType.QUERY) {
+			ruleMLContent = builder
+					.createQuery(new JAXBElement<?>[] { ifType });
+		}
+
 		JAXBElement<RuleMLType> ruleML = builder
-				.createRuleML(new JAXBElement<?>[] { assertType });
+				.createRuleML(new JAXBElement<?>[] { ruleMLContent });
 
 		// serialize and return
 		return builder.marshal(ruleML);
@@ -196,6 +300,7 @@ public class Drools2RuleMLTranslator {
 	 * 
 	 * @param groupElement
 	 *            The root groupElement
+	 * @param thenPart
 	 */
 	private JAXBElement<?> processGroupElement(GroupElement groupElement) {
 
@@ -263,14 +368,15 @@ public class Drools2RuleMLTranslator {
 				slots, pattern);
 		atomContent.addAll(unUsedProperties);
 
-		if (constraintsAnalyzer.getOther().size() > 0 ) {
+		if (constraintsAnalyzer.getOther().size() > 0) {
 			List<JAXBElement<?>> other = constraintsAnalyzer.getOther();
 			other.add(builder.createAtom(atomContent
 					.toArray(new JAXBElement<?>[atomContent.size()])));
-			JAXBElement<AndInnerType> and = builder.createAnd(other.toArray(new JAXBElement<?>[other.size()]));
+			JAXBElement<AndInnerType> and = builder.createAnd(other
+					.toArray(new JAXBElement<?>[other.size()]));
 			return and;
 		}
-		
+
 		return builder.createAtom(atomContent
 				.toArray(new JAXBElement<?>[atomContent.size()]));
 	}
