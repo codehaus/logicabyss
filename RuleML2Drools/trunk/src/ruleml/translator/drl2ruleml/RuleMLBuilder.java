@@ -13,6 +13,7 @@ import javax.xml.bind.Marshaller;
 import reactionruleml.AndInnerType;
 import reactionruleml.AssertType;
 import reactionruleml.AtomType;
+import reactionruleml.DoType;
 import reactionruleml.EqualType;
 import reactionruleml.ExistsType;
 import reactionruleml.IfType;
@@ -22,7 +23,9 @@ import reactionruleml.NegType;
 import reactionruleml.ObjectFactory;
 import reactionruleml.OpAtomType;
 import reactionruleml.OrInnerType;
+import reactionruleml.QueryType;
 import reactionruleml.RelType;
+import reactionruleml.RetractType;
 import reactionruleml.RuleMLType;
 import reactionruleml.SlotType;
 import reactionruleml.VarType;
@@ -129,6 +132,13 @@ public class RuleMLBuilder {
 		return factory.createIf(ifType);
 	}
 
+	public JAXBElement<DoType> createDo(JAXBElement<?>[] content) {
+		DoType doType = factory.createDoType();
+		doType.getUpdatePrimitivesContent().addAll(convertJAXBArray(content));
+		return factory.createDo(doType);
+	}
+	
+	
 	public JAXBElement<AssertType> createAssert(JAXBElement<?>[] content) {
 		AssertType assertType = factory.createAssertType();
 		assertType.getFormulaOrRulebaseOrAtom().addAll(
@@ -136,6 +146,20 @@ public class RuleMLBuilder {
 		return factory.createAssert(assertType);
 	}
 
+	public JAXBElement<RetractType> createRetract(JAXBElement<?>[] content) {
+		RetractType retractType = factory.createRetractType();
+		retractType.getFormulaOrRulebaseOrAtom().addAll(
+				convertJAXBArray(content));
+		return factory.createRetract(retractType);
+	}
+	
+	public JAXBElement<QueryType> createQuery(JAXBElement<?>[] content) {
+		QueryType queryType = factory.createQueryType();
+		queryType.getFormulaOrRulebaseOrAtom().addAll(
+				convertJAXBArray(content));
+		return factory.createQuery(queryType);
+	}	
+	
 	public JAXBElement<RuleMLType> createRuleML(JAXBElement<?>[] content) {
 		RuleMLType ruleMLType = factory.createRuleMLType();
 		ruleMLType.getAssertOrRetractOrQuery()
