@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import javax.xml.bind.JAXBElement;
 
@@ -16,7 +17,6 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.drools.KnowledgeBase;
 import org.drools.KnowledgeBaseFactory;
@@ -40,6 +40,7 @@ import org.drools.rule.builder.dialect.java.parser.JavaLocalDeclarationDescr;
 import org.drools.rule.builder.dialect.java.parser.JavaParser;
 
 import reactionruleml.AndInnerType;
+import reactionruleml.AtomType;
 import reactionruleml.DoType;
 import reactionruleml.IfType;
 import reactionruleml.IndType;
@@ -194,69 +195,6 @@ public class Drools2RuleMLTranslator {
 		return result;
 	}
 
-	private JAXBElement<?> processThenPart(PackageDescr pkgDescr) {
-		// get the first rule
-		RuleDescr ruleDescr = pkgDescr.getRules().get(0);
-		String consequence = (String) ruleDescr.getConsequence();
-
-		// parse the consequence
-		consequence = consequence.trim();
-		System.out.println(consequence);
-
-		if (consequence.startsWith("insert")) {
-			// rule type is assert
-
-		} else if (consequence.startsWith("retract")) {
-			// rule type is retract
-
-		} else {
-			throw new IllegalArgumentException(
-					"Could not get the type of the then part (only insert or retract permitted)");
-		}
-
-		// rule type is query
-		String s = "assert(new Own($person,$object, \"ttt\"))";
-
-		final CharStream charStream = new ANTLRStringStream(s);
-		final JavaLexer lexer = new JavaLexer(charStream);
-		final TokenStream tokenStream = new CommonTokenStream(lexer);
-		final JavaParser parser = new JavaParser(tokenStream);
-
-		try {
-			parser.primary();
-		} catch (RecognitionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		JavaAnalysisResult result = new JavaAnalysisResult();
-		result.setIdentifiers(parser.getIdentifiers());
-		
-		result.setLocalVariables(new HashMap<String, JavaLocalDeclarationDescr>());
-		for (Iterator it = parser.getLocalDeclarations().iterator(); it
-				.hasNext();) {
-			JavaLocalDeclarationDescr descr = (JavaLocalDeclarationDescr) it
-					.next();
-			for (Iterator identIt = descr.getIdentifiers().iterator(); identIt
-					.hasNext();) {
-				JavaLocalDeclarationDescr.IdentifierDescr ident = (JavaLocalDeclarationDescr.IdentifierDescr) identIt
-						.next();
-				result.addLocalVariable(ident.getIdentifier(), descr);
-			}
-		}
-		result.setBlockDescrs(parser.getBlockDescr());
-		
-		
-//		for (int i =0; i<tokenStream.size();i++) {
-//			Token token = tokenStream.get(i);
-//			System.out.println(token);
-//		}
-		
-//		return analyze(result, availableIdentifiers);
-
-		return null;
-	}
-
 	/**
 	 * Creates the wrapper on the group element
 	 * 
@@ -364,9 +302,9 @@ public class Drools2RuleMLTranslator {
 		atomContent.addAll(slots);
 
 		// put the unused relation properties in slots
-		List<JAXBElement<SlotType>> unUsedProperties = getUnusedProperties(
+		List<JAXBElement<SlotType>> unusedProperties = getUnusedProperties(
 				slots, pattern);
-		atomContent.addAll(unUsedProperties);
+		atomContent.addAll(unusedProperties);
 
 		if (constraintsAnalyzer.getOther().size() > 0) {
 			List<JAXBElement<?>> other = constraintsAnalyzer.getOther();
@@ -426,7 +364,7 @@ public class Drools2RuleMLTranslator {
 	private List<JAXBElement<SlotType>> getUnusedProperties(
 			List<JAXBElement<SlotType>> slots, Pattern pattern) {
 		// get the properties of the relation
-		List<String> properties = getRelationPropertiesFromClass(pattern);
+		List<String> properties = getPropertiesFromClass(((ClassObjectType) pattern.getObjectType()).getClassType());
 
 		// iterate over the slots and remove all the slotted properties
 		for (JAXBElement<SlotType> slot : slots) {
@@ -469,10 +407,115 @@ public class Drools2RuleMLTranslator {
 		return builder.createOp(relType);
 	}
 
-	/**
-	 * TODO Not implemented yet.
-	 */
-	private void transformThen() {
+	private JAXBElement<?> processThenPart(PackageDescr pkgDescr) {
+		try {
+			// get the first rule
+			RuleDescr ruleDescr = pkgDescr.getRules().get(0);
+			String consequence = (String) ruleDescr.getConsequence();			
+//			String consequence = "insert   ( new Own(\"Mary\",\"iPod\"))";
+			// String consequence = "retract($B)";
+
+			if (consequence.contains("insert")) {
+				return createInsert(consequence);
+			} else if (consequence.contains("retract")) {
+
+			} else {
+				throw new IllegalStateException(
+						"Can not process the then part because it is not an insert or retract");
+			}
+
+			return null;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+	}
+
+	private JAXBElement<?> createInsert(String insert)
+			throws ClassNotFoundException {
+		// get the data from consequence insert
+		List<String> dataFromInsert = getDataFromInsert(insert);
+
+		// get the name of the relation
+		String relName = "";
+		if (dataFromInsert.size() == 0) {
+			throw new IllegalStateException(
+					"The insert does not contain data: " + insert);
+		} else {
+			relName = dataFromInsert.get(0).trim();
+			dataFromInsert.remove(0);
+		}
+
+		// get the properties of the relation from the java class
+		if (relName.isEmpty()) {
+			throw new IllegalStateException("The relation name is empty: "
+					+ relName);
+		} else {
+			System.out.println("!"+relName+"!");
+			Class<?> clazz = Class.forName("ruleml.translator.TestDataModel$"+relName);
+			List<String> classProperties = getPropertiesFromClass(clazz);
+
+			System.out.println(dataFromInsert);
+			System.out.println(classProperties);
+			
+			if (dataFromInsert.size() != classProperties.size()) {
+				System.out
+						.printf("Warning : the relation properties count %s does not coincide with arguments found in the counstructor:"
+								+ classProperties, insert);
+			}
+
+			// create the list with elements, the content of the atom relation
+			List<JAXBElement<?>> jaxbElements = new ArrayList<JAXBElement<?>>();
+			RelType rel = Drools2RuleMLTranslator.builder.createRel(relName);
+			jaxbElements.add(Drools2RuleMLTranslator.builder.getFactory().createRel(rel));
+			
+			// iterate over the class properties
+			for (int i =0; i<classProperties.size();i++) {
+				JAXBElement<IndType> slotName = Drools2RuleMLTranslator.builder.createInd(classProperties.get(i));
+				JAXBElement<IndType> slotValue = Drools2RuleMLTranslator.builder.createInd(dataFromInsert.get(i));
+
+				JAXBElement<SlotType> slot = Drools2RuleMLTranslator.builder.createSlot(slotName, slotValue);
+				jaxbElements.add(slot);
+			}
+
+			JAXBElement<AtomType> atom = Drools2RuleMLTranslator.builder.createAtom(jaxbElements.toArray(new JAXBElement<?>[jaxbElements.size()]));
+			System.out.println(atom);
+			return atom;
+		}
+	}
+
+	private List<String> getDataFromInsert(String insert) {
+		insert = insert.trim();
+		List<String> result = new ArrayList<String>();
+
+		System.out.println(insert);
+		java.util.regex.Pattern p = java.util.regex.Pattern.compile("insert\\s*\\(\\s*(.+)\\s*\\);");
+		java.util.regex.Matcher m = p.matcher(insert);
+
+		if (m.matches() && m.groupCount() == 1) {
+			String s1 = m.group(1);
+			System.out.println("s1 : " + s1);
+			p = java.util.regex.Pattern.compile("new\\s+(.+)\\s*\\(\\s*(.+)\\s*\\)");
+			m = p.matcher(s1);
+
+			if (m.matches() && m.groupCount() == 2) {
+				result.add(m.group(1));
+				String s2 = m.group(2);
+				System.out.println("s2 : " + s2);
+				p = java.util.regex.Pattern.compile("\"?(\\S+)\"?(\\s*,\\s*\"?(\\S+)\"?\\s*)*");
+				m = p.matcher(s2);
+
+				System.out.println(m.matches());
+				System.out.println(m.groupCount());
+				
+				for (int i = 1; i <= m.groupCount(); i += 2) {
+					result.add(m.group(i));
+				}
+			}
+		}
+
+		System.out.println(result);
+		return result;
 	}
 
 	/**
@@ -480,24 +523,23 @@ public class Drools2RuleMLTranslator {
 	 * ruleml.
 	 * 
 	 * @param pattern
-	 *            The Dlr Pattern for which the relation should be created.
+	 *            The Drl Pattern for which the relation should be created.
 	 * @return List of all properties of the class represented from the pattern.
 	 */
-	private static List<String> getRelationPropertiesFromClass(Pattern pattern) {
+	public List<String> getPropertiesFromClass(Class<?> clazz) {
 		List<String> propertiesList = new ArrayList<String>();
-		ClassObjectType relClass = (ClassObjectType) pattern.getObjectType();
 		BeanInfo beanInfo;
 		try {
-			beanInfo = Introspector.getBeanInfo(relClass.getClassType(),
-					Object.class);
+			beanInfo = Introspector.getBeanInfo(clazz,Object.class);
 			PropertyDescriptor[] propertyDescriptors = beanInfo
-					.getPropertyDescriptors();
+			.getPropertyDescriptors();
 			for (PropertyDescriptor propertyDescriptor : propertyDescriptors) {
 				propertiesList.add(propertyDescriptor.getDisplayName());
 			}
+			return propertiesList;
 		} catch (IntrospectionException e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		return propertiesList;
 	}
 }
