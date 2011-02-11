@@ -33,11 +33,11 @@ import reactionruleml.VarType;
 public class RuleMLBuilder {
 	private ObjectFactory factory = new ObjectFactory();
 
-	public JAXBElement<SlotType> createSlot(JAXBElement<?> relationName,
-			JAXBElement<?> content) {
+	public JAXBElement<SlotType> createSlot(JAXBElement<?> slotName,
+			JAXBElement<?> slotValue) {
 		SlotType slotType = factory.createSlotType();
-		slotType.getContent().add(relationName);
-		slotType.getContent().add(content);
+		slotType.getContent().add(slotName);
+		slotType.getContent().add(slotValue);
 		return factory.createSlot(slotType);
 	}
 
@@ -172,7 +172,7 @@ public class RuleMLBuilder {
 		impliesType.getContent().addAll(Arrays.asList(content));
 		return factory.createImplies(impliesType);
 	}
-
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private List<?> convertJAXBArray(JAXBElement<?>[] content) {
 		List result = new ArrayList();

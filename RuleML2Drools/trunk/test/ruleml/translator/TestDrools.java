@@ -58,7 +58,7 @@ public class TestDrools {
 		}
 	}
 
-//	@Test
+	// @Test
 	public void testRuleML2Drools_1() {
 		System.out
 				.println("***********************   RuleML -> Drl  **************************");
@@ -78,7 +78,7 @@ public class TestDrools {
 		}
 	}
 
-//	@Test
+	// @Test
 	public void testRuleML2Drools_2() {
 		System.out
 				.println("------------------------   Derivation rule  ------------------------");
@@ -96,7 +96,7 @@ public class TestDrools {
 		}
 	}
 
-//	@Test
+	// @Test
 	public void testRuleML2Drools_3() {
 		System.out
 				.println("***********************   Production rule  **************************");
@@ -114,15 +114,17 @@ public class TestDrools {
 		}
 	}
 
-	 @Test
+	@Test
 	public void testDrools2RuleML_1() {
 		System.out
 				.println("------------------------   Drl -> RuleML ------------------------");
 		try {
-			Resource resource = ResourceFactory.newClassPathResource("drools/test1.drl");
+			Resource resource = ResourceFactory
+					.newClassPathResource("drools/test1.drl");
 			final DrlParser parser = new DrlParser();
-			final PackageDescr pkgDescr = parser.parse( resource.getInputStream() );
-			
+			final PackageDescr pkgDescr = parser.parse(resource
+					.getInputStream());
+
 			// load up the knowledge base
 			KnowledgeBase kbase = Drools2RuleMLTranslator
 					.readKnowledgeBase("drools/test1.drl");
