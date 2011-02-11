@@ -27,6 +27,7 @@ import reactionruleml.QueryType;
 import reactionruleml.RelType;
 import reactionruleml.RetractType;
 import reactionruleml.RuleMLType;
+import reactionruleml.RuleType;
 import reactionruleml.SlotType;
 import reactionruleml.VarType;
 
@@ -138,7 +139,6 @@ public class RuleMLBuilder {
 		return factory.createDo(doType);
 	}
 	
-	
 	public JAXBElement<AssertType> createAssert(JAXBElement<?>[] content) {
 		AssertType assertType = factory.createAssertType();
 		assertType.getFormulaOrRulebaseOrAtom().addAll(
@@ -160,10 +160,15 @@ public class RuleMLBuilder {
 		return factory.createQuery(queryType);
 	}	
 	
+	public JAXBElement<RuleType> createRule(JAXBElement<?>[] content) {
+		RuleType ruleType = factory.createRuleType();
+		ruleType.getContent().addAll(Arrays.asList(content));
+		return factory.createRule(ruleType);
+	}	
+	
 	public JAXBElement<RuleMLType> createRuleML(JAXBElement<?>[] content) {
 		RuleMLType ruleMLType = factory.createRuleMLType();
-		ruleMLType.getAssertOrRetractOrQuery()
-				.addAll(convertJAXBArray(content));
+		ruleMLType.getAssertOrRetractOrQuery().addAll(convertJAXBArray(content));
 		return factory.createRuleML(ruleMLType);
 	}
 

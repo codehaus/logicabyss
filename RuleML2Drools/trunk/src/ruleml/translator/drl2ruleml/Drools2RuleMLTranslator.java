@@ -40,6 +40,7 @@ import org.drools.rule.builder.dialect.java.parser.JavaLocalDeclarationDescr;
 import org.drools.rule.builder.dialect.java.parser.JavaParser;
 
 import reactionruleml.AndInnerType;
+import reactionruleml.AssertType;
 import reactionruleml.AtomType;
 import reactionruleml.DoType;
 import reactionruleml.IfType;
@@ -47,6 +48,7 @@ import reactionruleml.IndType;
 import reactionruleml.OpAtomType;
 import reactionruleml.RelType;
 import reactionruleml.RuleMLType;
+import reactionruleml.RuleType;
 import reactionruleml.SlotType;
 import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator.PropertyInfo.ValueType;
 
@@ -180,9 +182,8 @@ public class Drools2RuleMLTranslator {
 				// get the root group element
 				GroupElement[] transformedLhs = rule_.getTransformedLhs();
 
-				// process the right hand side (RHS or Then part) and set the
-				// type
-				JAXBElement<?> thenPart = translator.processThenPart(pkgDescr);
+				// process the RHS(Then) part and set the type
+				JAXBElement<?> thenPart = translator.processThenPart(pkgDescr.getRules().get(0).getConsequence().toString());
 
 				// transform the rule
 				JAXBElement<?> whenPart = translator
@@ -213,10 +214,11 @@ public class Drools2RuleMLTranslator {
 		JAXBElement<DoType> doType = builder
 				.createDo(new JAXBElement<?>[] { thenPart });
 
+		JAXBElement<RuleType> ruleType = builder.createRule (new JAXBElement<?>[] { ifType, doType });
+		
 		JAXBElement<?> ruleMLContent = null;
 		if (currentRuleType == DroolsRuleType.ASSERT) {
-			ruleMLContent = builder.createAssert(new JAXBElement<?>[] { ifType,
-					doType });
+			ruleMLContent = builder.createAssert(new JAXBElement<?>[] { ruleType });
 		} else if (currentRuleType == DroolsRuleType.RETRACT) {
 			ruleMLContent = builder.createRetract(new JAXBElement<?>[] {
 					ifType, doType });
@@ -407,18 +409,17 @@ public class Drools2RuleMLTranslator {
 		return builder.createOp(relType);
 	}
 
-	private JAXBElement<?> processThenPart(PackageDescr pkgDescr) {
+	private JAXBElement<?> processThenPart(String consequence) {
 		try {
-			// get the first rule
-			RuleDescr ruleDescr = pkgDescr.getRules().get(0);
-			String consequence = (String) ruleDescr.getConsequence();			
 //			String consequence = "insert   ( new Own(\"Mary\",\"iPod\"))";
 			// String consequence = "retract($B)";
 
 			if (consequence.contains("insert")) {
+				this.currentRuleType = DroolsRuleType.ASSERT;
 				return createInsert(consequence);
 			} else if (consequence.contains("retract")) {
-
+				this.currentRuleType = DroolsRuleType.RETRACT;
+				// return createRetract(consequence);
 			} else {
 				throw new IllegalStateException(
 						"Can not process the then part because it is not an insert or retract");
@@ -479,8 +480,9 @@ public class Drools2RuleMLTranslator {
 			}
 
 			JAXBElement<AtomType> atom = Drools2RuleMLTranslator.builder.createAtom(jaxbElements.toArray(new JAXBElement<?>[jaxbElements.size()]));
-			System.out.println(atom);
-			return atom;
+			JAXBElement<AssertType> assertType = Drools2RuleMLTranslator.builder.createAssert(new JAXBElement<?>[] {atom});
+				
+			return assertType;
 		}
 	}
 

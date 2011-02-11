@@ -58,7 +58,7 @@ public class TestDrools {
 		}
 	}
 
-	// @Test
+//	@Test
 	public void testRuleML2Drools_1() {
 		System.out
 				.println("***********************   RuleML -> Drl  **************************");
@@ -78,7 +78,7 @@ public class TestDrools {
 		}
 	}
 
-	// @Test
+//	 @Test
 	public void testRuleML2Drools_2() {
 		System.out
 				.println("------------------------   Derivation rule  ------------------------");
