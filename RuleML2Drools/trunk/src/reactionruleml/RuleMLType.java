@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  * 
  */
-@XmlRootElement
+@XmlRootElement (name = "RuleML")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "RuleML.type", propOrder = {
     "label",

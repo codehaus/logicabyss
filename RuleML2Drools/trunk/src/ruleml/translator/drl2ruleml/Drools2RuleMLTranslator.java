@@ -169,8 +169,7 @@ public class Drools2RuleMLTranslator {
 								.getConsequence().toString());
 
 				result += translator.wrapElement(whenPart, thenPart,
-						thenPartAnalyzer.getRuleStyle())
-						+ "\n*********************************************************\n";
+						thenPartAnalyzer.getRuleStyle());
 			}
 		}
 		return result;
@@ -223,7 +222,7 @@ public class Drools2RuleMLTranslator {
 				.createRuleML(new JAXBElement<?>[] { ruleMLContent });
 
 		// serialize and return
-		return builder.marshal(ruleML);
+		return builder.marshal(ruleML, false);
 	}
 
 	/**
