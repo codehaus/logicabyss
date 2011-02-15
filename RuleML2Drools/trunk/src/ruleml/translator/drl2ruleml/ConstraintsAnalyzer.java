@@ -38,6 +38,7 @@ public class ConstraintsAnalyzer {
 	
 	private List<Integer> uniqueVars = new ArrayList<Integer>();
 	private List<JAXBElement<?>> other = new ArrayList<JAXBElement<?>>();
+	private int uniqueVarNum = 1;
 	
 	public List getOther () {
 		return this.other;
@@ -202,15 +203,15 @@ public class ConstraintsAnalyzer {
 	}
 
 	private String createUniqueVar() {
-		Random random = new Random();
-		int unique;
-		do {
-			unique = random.nextInt(1000);
-		} while (this.uniqueVars.contains(unique));
+//		Random random = new Random();
+//		int unique;
+//		do {
+//			unique = random.nextInt(1000);
+//		} while (this.uniqueVars.contains(unique));
+//		
+//		uniqueVars.add(new Integer(unique));
 		
-		uniqueVars.add(new Integer(unique));
-		
-		return "VAR" + unique;
+		return "VAR" + uniqueVarNum++;
 	}
 
 	/**

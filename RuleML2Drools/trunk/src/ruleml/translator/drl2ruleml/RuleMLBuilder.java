@@ -138,7 +138,7 @@ public class RuleMLBuilder {
 		doType.getUpdatePrimitivesContent().addAll(convertJAXBArray(content));
 		return factory.createDo(doType);
 	}
-	
+
 	public JAXBElement<AssertType> createAssert(JAXBElement<?>[] content) {
 		AssertType assertType = factory.createAssertType();
 		assertType.getFormulaOrRulebaseOrAtom().addAll(
@@ -152,23 +152,24 @@ public class RuleMLBuilder {
 				convertJAXBArray(content));
 		return factory.createRetract(retractType);
 	}
-	
+
 	public JAXBElement<QueryType> createQuery(JAXBElement<?>[] content) {
 		QueryType queryType = factory.createQueryType();
-		queryType.getFormulaOrRulebaseOrAtom().addAll(
-				convertJAXBArray(content));
+		queryType.getFormulaOrRulebaseOrAtom()
+				.addAll(convertJAXBArray(content));
 		return factory.createQuery(queryType);
-	}	
-	
+	}
+
 	public JAXBElement<RuleType> createRule(JAXBElement<?>[] content) {
 		RuleType ruleType = factory.createRuleType();
 		ruleType.getContent().addAll(Arrays.asList(content));
 		return factory.createRule(ruleType);
-	}	
-	
+	}
+
 	public JAXBElement<RuleMLType> createRuleML(JAXBElement<?>[] content) {
 		RuleMLType ruleMLType = factory.createRuleMLType();
-		ruleMLType.getAssertOrRetractOrQuery().addAll(convertJAXBArray(content));
+		ruleMLType.getAssertOrRetractOrQuery()
+				.addAll(convertJAXBArray(content));
 		return factory.createRuleML(ruleMLType);
 	}
 
@@ -177,7 +178,7 @@ public class RuleMLBuilder {
 		impliesType.getContent().addAll(Arrays.asList(content));
 		return factory.createImplies(impliesType);
 	}
-	
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private List<?> convertJAXBArray(JAXBElement<?>[] content) {
 		List result = new ArrayList();
@@ -193,14 +194,17 @@ public class RuleMLBuilder {
 		return factory;
 	}
 
-	public String marshal(JAXBElement<RuleMLType> ruleML) {
+	public String marshal(JAXBElement<?> ruleML) {
+		return marshal(ruleML, true);
+	}
+
+	public String marshal(JAXBElement<?> ruleML, boolean formatted) {
 		try {
 			JAXBContext jContext = JAXBContext.newInstance("reactionruleml");
 
 			Marshaller marshaller = jContext.createMarshaller();
 
-			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-					Boolean.TRUE);
+			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formatted);
 
 			StringWriter writer = new StringWriter();
 			marshaller.marshal(ruleML.getValue(), writer);
