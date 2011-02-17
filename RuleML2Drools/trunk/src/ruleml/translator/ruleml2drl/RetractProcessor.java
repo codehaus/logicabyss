@@ -27,7 +27,7 @@ public class RetractProcessor extends RuleMLGenericProcessor {
 				.getFormulaOrRulebaseOrAtom();
 
 		for (Object o : formulaOrRulebaseOrAtom) {
-			// create a empty rule
+			// create an empty rule
 			Rule currentRule = new Rule();
 
 			// forward
@@ -35,19 +35,28 @@ public class RetractProcessor extends RuleMLGenericProcessor {
 
 			// add the current rule to the list with rules
 			currentRule.setRuleName("rule" + ruleNumber++);
-			if (this.whenPatterns.isEmpty()) {
-				throw new IllegalArgumentException(
-						"Restrict condition can not be empty");
+			if (translator.getWhenPatterns().isEmpty()) {
+				if (translator.getThenPatterns().size() != 1  ) {
+					throw new IllegalStateException("The then part should contain only one action to be transformed!");
+				}
+
+				translator.getThenPatterns().get(0).setVariable(varToRetract);
+				currentRule.setWhenPart(translator.getThenPatterns().toArray());
+				currentRule.setThenPart(new String[] {"retract ("+varToRetract+");"});
+				
+//				throw new IllegalArgumentException(
+//						"Retract condition can not be empty");
 			} else {
-				currentRule.setWhenPart(this.whenPatterns.toArray());
+				currentRule.setWhenPart(translator.getWhenPatterns().toArray());
 				currentRule.setThenPart(new String[] { "retract("
 						+ varToRetract + ")" });
-				translator.getDrl().addRule(currentRule);
 
-				// reset the patterns
-				this.whenPatterns.clear();
-				this.thenPatterns.clear();
 			}
+
+			translator.getDrl().addRule(currentRule);
+			// reset the patterns
+			translator.getWhenPatterns().clear();
+			translator.getThenPatterns().clear();
 		}
 	}
 }

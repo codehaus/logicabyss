@@ -29,6 +29,8 @@ import reactionruleml.RetractType;
 import reactionruleml.RuleMLType;
 import reactionruleml.RuleType;
 import reactionruleml.SlotType;
+import reactionruleml.ThenType;
+import reactionruleml.UpdateType;
 import reactionruleml.VarType;
 
 public class RuleMLBuilder {
@@ -137,6 +139,26 @@ public class RuleMLBuilder {
 		DoType doType = factory.createDoType();
 		doType.getUpdatePrimitivesContent().addAll(convertJAXBArray(content));
 		return factory.createDo(doType);
+	}
+
+	public JAXBElement<ThenType> createThen(JAXBElement<?>[] content) {
+		ThenType thenType = factory.createThenType();
+
+		for (JAXBElement<?> element : content) {
+			if (element.getValue() instanceof AtomType) {
+				thenType.setAtom((AtomType) element.getValue());
+			} else if (element.getValue() instanceof AssertType) {
+				thenType.setAssert((AssertType) element.getValue());
+			} else if (element.getValue() instanceof RetractType) {
+				thenType.setRetract((RetractType) element.getValue());
+			} else if (element.getValue() instanceof UpdateType) {
+				thenType.setUpdate((UpdateType) element.getValue());
+			} else if (element.getValue() instanceof EqualType) {
+				thenType.setEqual((EqualType) element.getValue());
+			}
+		}
+
+		return factory.createThen(thenType);
 	}
 
 	public JAXBElement<AssertType> createAssert(JAXBElement<?>[] content) {

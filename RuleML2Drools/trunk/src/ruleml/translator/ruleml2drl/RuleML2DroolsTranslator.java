@@ -16,6 +16,7 @@ import reactionruleml.AndInnerType;
 import reactionruleml.AndQueryType;
 import reactionruleml.AssertType;
 import reactionruleml.AtomType;
+import reactionruleml.DoType;
 import reactionruleml.IfType;
 import reactionruleml.ImpliesType;
 import reactionruleml.IndType;
@@ -40,7 +41,40 @@ import ruleml.translator.ruleml2drl.DroolsBuilder.Rule;
 public class RuleML2DroolsTranslator {
 
 	private Drl drl = new Drl();
-	RuleMLGenericProcessor currentProcessor;
+	
+	private RuleMLGenericProcessor currentProcessor;
+	private AssertProcessor assertProcessor;
+	private RetractProcessor retractProcessor;
+	private QueryProcessor queryProcessor;
+	
+	private List<DrlPattern> whenPatterns = new ArrayList<DrlPattern>();
+	private List<DrlPattern> thenPatterns = new ArrayList<DrlPattern>();
+	private PartType currentContext = PartType.WHEN;
+	
+	public PartType getCurrentContext() {
+		return currentContext;
+	}
+
+	public void setCurrentContext(PartType currentContext) {
+		this.currentContext = currentContext;
+	}
+
+	public List<DrlPattern> getWhenPatterns() {
+		return whenPatterns;
+	}
+
+	public void setWhenPatterns(List<DrlPattern> whenPatterns) {
+		this.whenPatterns = whenPatterns;
+	}
+
+	public List<DrlPattern> getThenPatterns() {
+		return thenPatterns;
+	}
+
+	public void setThenPatterns(List<DrlPattern> thenPatterns) {
+		this.thenPatterns = thenPatterns;
+	}
+
 
 	public Drl getDrl() {
 		return drl;
@@ -193,14 +227,25 @@ public class RuleML2DroolsTranslator {
 			currentProcessor.processIf((IfType) value);
 		} else if (value instanceof ThenType) {
 			currentProcessor.processThen((ThenType) value);
+		} else if (value instanceof DoType) {
+			currentProcessor.processDo((DoType) value);
 		} else if (value instanceof AssertType) {
-			currentProcessor = new AssertProcessor(this);
+			if (assertProcessor == null) {
+				assertProcessor = new AssertProcessor(this);
+			}
+			currentProcessor = assertProcessor;
 			currentProcessor.processAssert((AssertType) value);
 		} else if (value instanceof RetractType) {
-			currentProcessor = new RetractProcessor(this);
+			if (retractProcessor == null) {
+				retractProcessor = new RetractProcessor(this); 
+			}
+			currentProcessor = retractProcessor;
 			currentProcessor.processRetract((RetractType) value);
 		} else if (value instanceof QueryType) {
-			currentProcessor = new QueryProcessor(this);
+			if (queryProcessor == null) {
+				queryProcessor = new QueryProcessor(this);
+			}
+			currentProcessor = queryProcessor;
 			currentProcessor.processQuery((QueryType) value);
 		} else if (value instanceof ImpliesType) {
 			currentProcessor.processImplies((ImpliesType) value);
