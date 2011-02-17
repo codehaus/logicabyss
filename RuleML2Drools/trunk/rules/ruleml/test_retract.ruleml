@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<RuleML
-	xsi:schemaLocation="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/pr.xsd">
-	<Retract>
+<RuleML xmlns="http://www.ruleml.org/1.0/xsd">
+	<Assert>
 		<Rule>
 			<if>
 				<And>
@@ -15,11 +14,11 @@
 						</slot>
 						<slot>
 							<Ind>seller</Ind>
-							<Var />
+							<Var>Seller</Var>
 						</slot>
 						<slot>
 							<Ind>item</Ind>
-							<Ind>Objective</Ind>
+							<Ind>ThinkPad</Ind>
 						</slot>
 					</Atom>
 					<Atom>
@@ -32,7 +31,7 @@
 						</slot>
 						<slot>
 							<Ind>age</Ind>
-							<Var />
+							<Var>Var1</Var>
 						</slot>
 					</Atom>
 				</And>
@@ -49,16 +48,48 @@
 						</slot>
 						<slot>
 							<Ind>seller</Ind>
-							<Var />
+							<Var>Seller</Var>
 						</slot>
 						<slot>
 							<Ind>item</Ind>
-							<Ind>Objective</Ind>
+							<Ind>ThinkPad</Ind>
 						</slot>
 					</Atom>
 				</Retract>
 			</do>
 		</Rule>
+		<Atom>
+			<op>
+				<Rel>Own</Rel>
+			</op>
+			<slot>
+				<Ind>owner</Ind>
+				<Ind>Ti6o</Ind>
+			</slot>
+			<slot>
+				<Ind>item</Ind>
+				<Ind>laptop</Ind>
+			</slot>
+		</Atom>
+	</Assert>
+	<Retract>
+		<Atom>
+			<op>
+				<Rel>Buy</Rel>
+			</op>
+			<slot>
+				<Ind>buyer</Ind>
+				<Ind>Ti6o</Ind>
+			</slot>
+			<slot>
+				<Ind>seller</Ind>
+				<Ind>Amazon</Ind>
+			</slot>
+			<slot>
+				<Ind>item</Ind>
+				<Ind>ThinkPad</Ind>
+			</slot>
+		</Atom>
 	</Retract>
 </RuleML>
 

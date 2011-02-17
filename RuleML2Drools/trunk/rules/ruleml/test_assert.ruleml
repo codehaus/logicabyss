@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<RuleML
-	xmlns="http://svn.codehaus.org/logicabyss/RuleML2Drools/trunk/resources/rrml/pr.xsd">
+<RuleML xmlns="http://www.ruleml.org/1.0/xsd">
 	<Assert>
 		<Rule>
 			<if>
@@ -10,8 +9,14 @@
 							<op>
 								<Rel>LessThan</Rel>
 							</op>
-							<Var>VAR302</Var>
-							<Ind>13</Ind>
+							<slot>
+								<Ind>variable</Ind>
+								<Var>VAR1</Var>
+							</slot>
+							<slot>
+								<Ind>reference</Ind>
+								<Ind>13</Ind>
+							</slot>
 						</Atom>
 						<Atom>
 							<op>
@@ -19,11 +24,11 @@
 							</op>
 							<slot>
 								<Ind>name</Ind>
-								<Ind>john</Ind>
+								<Ind>John</Ind>
 							</slot>
 							<slot>
 								<Ind>age</Ind>
-								<Var>VAR302</Var>
+								<Var>VAR1</Var>
 							</slot>
 						</Atom>
 					</And>
@@ -33,15 +38,15 @@
 						</op>
 						<slot>
 							<Ind>buyer</Ind>
-							<Var>$person</Var>
+							<Var>Person</Var>
 						</slot>
 						<slot>
 							<Ind>seller</Ind>
-							<Var>$merchant</Var>
+							<Var>Merchant</Var>
 						</slot>
 						<slot>
 							<Ind>item</Ind>
-							<Var>$object</Var>
+							<Ind>laptop</Ind>
 						</slot>
 					</Atom>
 					<Atom>
@@ -50,11 +55,11 @@
 						</op>
 						<slot>
 							<Ind>keeper</Ind>
-							<Var>$person</Var>
+							<Var>Person</Var>
 						</slot>
 						<slot>
 							<Ind>item</Ind>
-							<Ind>test</Ind>
+							<Ind>laptop</Ind>
 						</slot>
 					</Atom>
 				</And>
@@ -67,15 +72,28 @@
 						</op>
 						<slot>
 							<Ind>owner</Ind>
-							<Var>$person</Var>
+							<Var>Person</Var>
 						</slot>
 						<slot>
 							<Ind>item</Ind>
-							<Ind>test</Ind>
+							<Ind>laptop</Ind>
 						</slot>
 					</Atom>
 				</Assert>
 			</do>
 		</Rule>
+		<Atom>
+			<op>
+				<Rel>Keep</Rel>
+			</op>
+			<slot>
+				<Ind>keeper</Ind>
+				<Ind>Ti6o</Ind>
+			</slot>
+			<slot>
+				<Ind>item</Ind>
+				<Ind>laptop</Ind>
+			</slot>
+		</Atom>
 	</Assert>
 </RuleML>

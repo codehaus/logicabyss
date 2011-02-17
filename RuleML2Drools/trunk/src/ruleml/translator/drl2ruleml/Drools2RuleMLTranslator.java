@@ -27,6 +27,7 @@ import reactionruleml.DoType;
 import reactionruleml.IfType;
 import reactionruleml.RuleMLType;
 import reactionruleml.RuleType;
+import reactionruleml.ThenType;
 
 /**
  * Translator for Drools rules to RuleML
@@ -200,29 +201,23 @@ public class Drools2RuleMLTranslator {
 					.createRetract(new JAXBElement<?>[] { thenPart });
 		}
 
+		// JAXBElement<ThenType> thenType = builder
+		// .createThen(new JAXBElement<?>[] { thenPart });
+
 		JAXBElement<DoType> doType = builder
 				.createDo(new JAXBElement<?>[] { assertOrRetract });
 
 		JAXBElement<RuleType> ruleType = builder
 				.createRule(new JAXBElement<?>[] { ifType, doType });
 
-		JAXBElement<?> ruleMLContent = null;
-		if (ruleStyle == RuleStyle.ASSERT) {
-			ruleMLContent = builder
+		JAXBElement<?> ruleMLContent = builder
 					.createAssert(new JAXBElement<?>[] { ruleType });
-		} else if (ruleStyle == RuleStyle.RETRACT) {
-			ruleMLContent = builder
-					.createRetract(new JAXBElement<?>[] { ruleType });
-		} else if (ruleStyle == RuleStyle.QUERY) {
-			ruleMLContent = builder
-					.createQuery(new JAXBElement<?>[] { ifType });
-		}
 
 		JAXBElement<RuleMLType> ruleML = builder
 				.createRuleML(new JAXBElement<?>[] { ruleMLContent });
 
 		// serialize and return
-		return builder.marshal(ruleML, false);
+		return builder.marshal(ruleML, true);
 	}
 
 	/**

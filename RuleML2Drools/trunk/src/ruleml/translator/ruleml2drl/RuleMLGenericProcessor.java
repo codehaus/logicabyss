@@ -9,6 +9,7 @@ import reactionruleml.AndInnerType;
 import reactionruleml.AndQueryType;
 import reactionruleml.AssertType;
 import reactionruleml.AtomType;
+import reactionruleml.DoType;
 import reactionruleml.IfType;
 import reactionruleml.ImpliesType;
 import reactionruleml.IndType;
@@ -26,11 +27,8 @@ import ruleml.translator.ruleml2drl.RuleML2DroolsTranslator.PartType;
 
 public class RuleMLGenericProcessor {
 
-	protected List<DrlPattern> whenPatterns = new ArrayList<DrlPattern>();
-	protected List<DrlPattern> thenPatterns = new ArrayList<DrlPattern>();
 	protected DrlPattern currentDrlPattern;
 	protected List<String> boundVars = new ArrayList<String>();
-	protected PartType currentContext = PartType.WHEN;
 	protected static int ruleNumber = 1;
 
 	protected RuleML2DroolsTranslator translator;
@@ -41,16 +39,14 @@ public class RuleMLGenericProcessor {
 
 	/*********************** Methods to process single RuleML elements ****************/
 
-	public DrlPattern processAtom(AtomType atomType) {
+	public void processAtom(AtomType atomType) {
 		translator.dispatchType(atomType.getContent());
 
-		if (currentContext.equals(PartType.WHEN)) {
-			whenPatterns.add(currentDrlPattern);
+		if (translator.getCurrentContext().equals(PartType.WHEN)) {
+			translator.getWhenPatterns().add(currentDrlPattern);
 		} else {
-			thenPatterns.add(currentDrlPattern);
+			translator.getThenPatterns().add(currentDrlPattern);
 		}
-
-		return null;
 	}
 
 	public void processSlot(SlotType slotType) {
@@ -75,7 +71,7 @@ public class RuleMLGenericProcessor {
 			slotValue = "\"" + rawSlotValue + "\"";
 		}
 
-		if (currentContext.equals(PartType.WHEN)) {
+		if (translator.getCurrentContext().equals(PartType.WHEN)) {
 			// current context part = WHEN
 			if (currentDrlPattern != null) {
 				// check if the var was already bound
@@ -133,7 +129,7 @@ public class RuleMLGenericProcessor {
 	}
 
 	public void processIf(IfType ifType) {
-		currentContext = PartType.WHEN;
+		translator.setCurrentContext(PartType.WHEN);
 
 		if (ifType.getAnd() != null) {
 			translator.dispatchType(ifType.getAnd());
@@ -149,10 +145,15 @@ public class RuleMLGenericProcessor {
 	}
 
 	public void processThen(ThenType thenType) {
-		currentContext = PartType.THEN;
+		translator.setCurrentContext(PartType.THEN);
 		translator.dispatchType(thenType.getAtom());
 	}
 
+	public void processDo(DoType doType) {
+		translator.setCurrentContext(PartType.THEN);
+		translator.dispatchType(doType.getUpdatePrimitivesContent());
+	}
+	
 	public void processImplies(ImpliesType impliesType) {
 		translator.dispatchType(impliesType.getContent());
 	}
@@ -168,15 +169,14 @@ public class RuleMLGenericProcessor {
 	public void processRetract(RetractType retractType) {
 		// noop
 	}
-
+	
 	public void processQuery(QueryType queryType) {
 		// noop
 	}
 
 	public void processThenPatterns(String prefix) {
-		for (DrlPattern pattern : this.thenPatterns) {
+		for (DrlPattern pattern : translator.getThenPatterns()) {
 			pattern.setPrefix(prefix);
 		}
 	}
-
 }
