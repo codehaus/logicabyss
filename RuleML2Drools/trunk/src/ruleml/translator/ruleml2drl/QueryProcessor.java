@@ -7,10 +7,6 @@ import ruleml.translator.ruleml2drl.DroolsBuilder.Query;
 
 public class QueryProcessor extends RuleMLGenericProcessor {
 
-	public QueryProcessor(RuleML2DroolsTranslator translator) {
-		super(translator);
-	}
-
 	public void processQuery(QueryType queryType) {
 		List<Object> formulaOrRulebaseOrAtom = queryType
 				.getFormulaOrRulebaseOrAtom();
@@ -23,16 +19,16 @@ public class QueryProcessor extends RuleMLGenericProcessor {
 
 			// add the current rule to the list with rules
 			query.setRuleName("query" + ruleNumber++);
-			if (this.whenPatterns.isEmpty()) {
+			if (translator.getWhenPatterns().isEmpty()) {
 				throw new IllegalArgumentException(
 						"Restrict condition can not be empty");
 			} else {
-				query.setWhenPart(this.whenPatterns.toArray());
+				query.setWhenPart(translator.getWhenPatterns().toArray());
 				translator.getDrl().addQuery(query);
 
 				// reset the patterns
-				this.whenPatterns.clear();
-				this.thenPatterns.clear();
+				translator.getWhenPatterns().clear();
+				translator.getThenPatterns().clear();
 			}
 		}
 	}

@@ -22,6 +22,7 @@ import reactionruleml.RuleType;
 import reactionruleml.SlotType;
 import reactionruleml.ThenType;
 import reactionruleml.VarType;
+import ruleml.translator.ruleml2drl.DroolsBuilder.Rule;
 import ruleml.translator.ruleml2drl.RuleML2DroolsTranslator.DrlPattern;
 import ruleml.translator.ruleml2drl.RuleML2DroolsTranslator.PartType;
 
@@ -29,17 +30,20 @@ public class RuleMLGenericProcessor {
 
 	protected DrlPattern currentDrlPattern;
 	protected List<String> boundVars = new ArrayList<String>();
-	protected static int ruleNumber = 1;
-
+	protected int ruleNumber = 1;
 	protected RuleML2DroolsTranslator translator;
 
-	public RuleMLGenericProcessor(RuleML2DroolsTranslator translator) {
+	public void setTranslator(RuleML2DroolsTranslator translator) {
 		this.translator = translator;
 	}
 
 	/*********************** Methods to process single RuleML elements ****************/
 
 	public void processAtom(AtomType atomType) {
+
+		// create the new pattern for this atom
+		currentDrlPattern = new DrlPattern();
+
 		translator.dispatchType(atomType.getContent());
 
 		if (translator.getCurrentContext().equals(PartType.WHEN)) {
@@ -71,7 +75,8 @@ public class RuleMLGenericProcessor {
 			slotValue = "\"" + rawSlotValue + "\"";
 		}
 
-		if (translator.getCurrentContext().equals(PartType.WHEN)) {
+		if (translator.getCurrentContext() == PartType.WHEN
+				|| translator.getCurrentContext() == PartType.NONE) {
 			// current context part = WHEN
 			if (currentDrlPattern != null) {
 				// check if the var was already bound
@@ -113,7 +118,7 @@ public class RuleMLGenericProcessor {
 
 	public void processRel(RelType relType) {
 		String relName = relType.getContent().get(0);
-		currentDrlPattern = new DrlPattern(relName);
+		currentDrlPattern.setRelName(relName);
 	}
 
 	public void processAnd(AndInnerType andType) {
@@ -153,7 +158,7 @@ public class RuleMLGenericProcessor {
 		translator.setCurrentContext(PartType.THEN);
 		translator.dispatchType(doType.getUpdatePrimitivesContent());
 	}
-	
+
 	public void processImplies(ImpliesType impliesType) {
 		translator.dispatchType(impliesType.getContent());
 	}
@@ -162,21 +167,107 @@ public class RuleMLGenericProcessor {
 		translator.dispatchType(ruleType.getContent());
 	}
 
-	public void processAssert(AssertType assertType) {
-		// noop
-	}
+	private String varToRetract = "$var";
 
 	public void processRetract(RetractType retractType) {
-		// noop
+		List<Object> formulaOrRulebaseOrAtom = retractType
+				.getFormulaOrRulebaseOrAtom();
+
+		for (Object o : formulaOrRulebaseOrAtom) {
+			if (o instanceof AtomType) {
+				// create a empty rule
+				Rule currentRule = new Rule();
+
+				// simulate the WEHEN-part
+				translator.setCurrentContext(PartType.WHEN);
+
+				// forward
+				translator.dispatchType(o);
+
+				// set the bound variable for the pattern
+				currentDrlPattern.setVariable(varToRetract);
+
+				// set the name of the rule
+				currentRule.setRuleName("rule" + ruleNumber++);
+
+				// if (translator.getThenPatterns().size() != 1) {
+				// throw new
+				// IllegalStateException("The retract has not the right format: only one pattern is for the translation permited.");
+				// }
+
+				// process the specific part of the retract or assert
+				// translator.getWhenPatterns().addAll(translator.getThenPatterns());
+				currentRule.setWhenPart(translator.getWhenPatterns().toArray());
+				currentRule.setThenPart(new String[] { "retract ("
+						+ varToRetract + ");" });
+
+				// add the rule to the drools object
+				translator.getDrl().addRule(currentRule);
+
+				// reset the patterns and state
+				translator.getWhenPatterns().clear();
+				translator.getThenPatterns().clear();
+				translator.setCurrentContext(PartType.NONE);
+
+			} else if (o instanceof RuleType) {
+				// only dispatch forward
+				translator.dispatchType(o);
+			}
+		}
 	}
-	
-	public void processQuery(QueryType queryType) {
+
+	public void processAssert(AssertType assertType) {
+		List<Object> formulaOrRulebaseOrAtom = assertType
+				.getFormulaOrRulebaseOrAtom();
+
+		for (Object o : formulaOrRulebaseOrAtom) {
+			if (o instanceof AtomType) {
+				// create a empty rule
+				Rule currentRule = new Rule();
+
+				// simulate THEN-part
+				translator.setCurrentContext(PartType.THEN);
+				
+				// forward
+				translator.dispatchType(o);
+
+				currentRule.setRuleName("rule" + ruleNumber++);
+
+				// process the specific part of the retract or assert
+				// check for empty WHEN-part of the current rule
+				if (translator.getWhenPatterns().isEmpty()) {
+					currentRule.setWhenPart(new String[] { "eval(true)" });
+				} else {
+					currentRule.setWhenPart(translator.getWhenPatterns()
+							.toArray());
+				}
+
+				for (DrlPattern pattern : translator.getThenPatterns()) {
+					pattern.setPrefix("insert");
+				}
+
+				currentRule.setThenPart(translator.getThenPatterns().toArray());
+
+				// add the rule to the drools object
+				translator.getDrl().addRule(currentRule);
+
+				// reset the patterns and state
+				translator.getWhenPatterns().clear();
+				translator.getThenPatterns().clear();
+				translator.setCurrentContext(PartType.NONE);
+
+			} else if (o instanceof RuleType) {
+				// only dispatch forward
+				translator.dispatchType(o);
+			}
+		}
+	}
+
+	public void processSpecific(Rule currentRule) {
 		// noop
 	}
 
-	public void processThenPatterns(String prefix) {
-		for (DrlPattern pattern : translator.getThenPatterns()) {
-			pattern.setPrefix(prefix);
-		}
+	public void processQuery(QueryType queryType) {
+		// noop
 	}
 }

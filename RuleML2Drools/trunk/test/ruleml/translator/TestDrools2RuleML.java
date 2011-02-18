@@ -1,5 +1,6 @@
 package ruleml.translator;
 
+import junit.framework.TestCase;
 
 import org.drools.KnowledgeBase;
 import org.drools.compiler.DrlParser;
@@ -16,7 +17,7 @@ import static org.junit.Assert.fail;
 
 import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator;
 
-public class TestDrools2RuleML {
+public class TestDrools2RuleML extends TestCase{
 
 	@Test
 	public void test_Assert() {
