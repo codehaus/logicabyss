@@ -186,4 +186,21 @@ public class TestDataModel {
 			this.age = age;
 		}
 	}
+
+	public static class Likes {
+		private String person;
+		private String object;
+		public String getPerson() {
+			return person;
+		}
+		public void setPerson(String person) {
+			this.person = person;
+		}
+		public String getObject() {
+			return object;
+		}
+		public void setObject(String object) {
+			this.object = object;
+		}
+	}
 }
