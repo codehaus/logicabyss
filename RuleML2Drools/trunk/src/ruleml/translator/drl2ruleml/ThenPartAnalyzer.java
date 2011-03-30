@@ -11,12 +11,12 @@ import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.drools.rule.builder.dialect.java.parser.JavaLexer;
 
-import reactionruleml.AssertType;
 import reactionruleml.AtomType;
 import reactionruleml.IndType;
 import reactionruleml.RelType;
 import reactionruleml.SlotType;
 import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator.RuleStyle;
+import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo;
 
 public class ThenPartAnalyzer {
 
@@ -53,14 +53,13 @@ public class ThenPartAnalyzer {
 	private JAXBElement<?> createRetract(String retract) {
 		List<CommonToken> tokens = getTokensFromThenPart(retract);
 		if (tokens.size() != 1) {
-			throw new RuntimeException("The retract statement in the Then-part does not match the pattern: retract ($Var)");
+			throw new RuntimeException(
+					"The retract statement in the Then-part does not match the pattern: retract ($Var)");
 		}
-		
-		return whenPartAnalyzer.getAtomFromName (tokens.get(0).getText());
+
+		return whenPartAnalyzer.getAtomFromName(tokens.get(0).getText());
 	}
 
-
-	
 	private JAXBElement<?> createInsert(String insert)
 			throws ClassNotFoundException {
 		// get the data from consequence insert
@@ -100,36 +99,45 @@ public class ThenPartAnalyzer {
 
 			// iterate over the class properties
 			for (int i = 0; i < classProperties.size(); i++) {
+				// set the slot name
 				JAXBElement<IndType> slotName = Drools2RuleMLTranslator.builder
 						.createInd(classProperties.get(i));
-				
+
+				// set the slot value
 				JAXBElement<?> slotValue = null;
-				if (dataFromInsert.get(i).getText().contains("\"")) {
-					String s = dataFromInsert.get(i).getText().replace("\"","");
+				String value = dataFromInsert.get(i).getText();
+
+				if (value.contains("\"")) {
+					// value is a constant
+
+					value = value.replace("\"", "");
 					slotValue = Drools2RuleMLTranslator.builder
-					.createInd(s);
+							.createInd(value);
 				} else {
-					slotValue = Drools2RuleMLTranslator.builder.createVar(dataFromInsert.get(i).getText());
+					// value is a variable. Check if the variable is in the bound vars
+					PropertyInfo propertyInfo = whenPartAnalyzer.getBindingsManager().get(value); 
+					if (propertyInfo != null && propertyInfo.getValue() != null) {
+						value = propertyInfo.getValue();
+					}
+					slotValue = Drools2RuleMLTranslator.builder
+							.createVar(value);
 				}
 
+				// create slot
 				JAXBElement<SlotType> slot = Drools2RuleMLTranslator.builder
 						.createSlot(slotName, slotValue);
 				jaxbElements.add(slot);
 			}
 
+			// create atom
 			JAXBElement<AtomType> atom = Drools2RuleMLTranslator.builder
 					.createAtom(jaxbElements
 							.toArray(new JAXBElement<?>[jaxbElements.size()]));
-//			JAXBElement<AssertType> assertType = Drools2RuleMLTranslator.builder
-//					.createAssert(new JAXBElement<?>[] { atom });
-//
-//			return assertType;
 			return atom;
 		}
 	}
 
-	
-	private List<CommonToken> getTokensFromThenPart (String insert) {
+	private List<CommonToken> getTokensFromThenPart(String insert) {
 		List<CommonToken> result = new ArrayList<CommonToken>();
 		try {
 			CharStream cs = new ANTLRStringStream(insert);
@@ -145,8 +153,8 @@ public class ThenPartAnalyzer {
 					result.add(token);
 				}
 			}
-		
-			// remove  the insert or retract
+
+			// remove the insert or retract
 			result.remove(0);
 
 			return result;
@@ -154,6 +162,6 @@ public class ThenPartAnalyzer {
 			throw new IllegalStateException(
 					"Error: Could not parse the then part of the drolls source");
 		}
-		
+
 	}
 }

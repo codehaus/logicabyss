@@ -3,8 +3,9 @@ import ruleml.translator.TestDataModel.*;
 
 rule "test2"
 when
-	$B : Buy ($buyer : buyer=="Ti6o", seller=="Dealer", item=="Objective")
-	$P : Person ( name==$buyer )
+	$p : Person ( name=="Tisho" )
+	$b : Buy (buyer==$p, $s:seller, $i:item=="Object")
+	Keep (keeper==$p, item==$i)
 then
-	retract ($B);
+	retract ($b);
 end

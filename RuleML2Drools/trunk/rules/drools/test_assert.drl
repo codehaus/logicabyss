@@ -3,9 +3,9 @@ import ruleml.translator.TestDataModel.*;
 
 rule "test1"
 when
-    Person( $person: name == "john", age < 13 )
-	b:Buy(buyer==$person, $merchant:seller, $object:item)
-	Keep(keeper==$person,item=="test")
+    $p:Person( name == "Tisho", age < 31 )
+	$b:Buy(buyer == $p, $s:seller, $i:item=="Amazon")
+	Keep(keeper == $p, item == $i)
 then
-	insert( new Own($person,$object));
+	insert( new Own($i, $p));
 end

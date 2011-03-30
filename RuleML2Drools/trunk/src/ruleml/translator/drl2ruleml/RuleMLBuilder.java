@@ -21,6 +21,7 @@ import reactionruleml.ImpliesType;
 import reactionruleml.IndType;
 import reactionruleml.NegType;
 import reactionruleml.ObjectFactory;
+import reactionruleml.OidType;
 import reactionruleml.OpAtomType;
 import reactionruleml.OrInnerType;
 import reactionruleml.QueryType;
@@ -113,6 +114,12 @@ public class RuleMLBuilder {
 		return relType;
 	}
 
+	public JAXBElement<OidType> createOid(String identifier) {
+		OidType oidType = factory.createOidType();
+		oidType.setVar(createVar(identifier).getValue());
+		return factory.createOid(oidType);
+	}
+	
 	public JAXBElement<OpAtomType> createOp(RelType relType) {
 		OpAtomType opAtomType = factory.createOpAtomType();
 		opAtomType.setRel(relType);
@@ -206,7 +213,9 @@ public class RuleMLBuilder {
 		List result = new ArrayList();
 
 		for (JAXBElement<?> jaxbElement : content) {
-			result.add(jaxbElement.getValue());
+			if (jaxbElement != null) {
+				result.add(jaxbElement.getValue());
+			}
 		}
 
 		return result;

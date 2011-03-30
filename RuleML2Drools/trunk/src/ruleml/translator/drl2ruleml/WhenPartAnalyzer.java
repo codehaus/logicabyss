@@ -9,22 +9,28 @@ import javax.xml.bind.JAXBElement;
 
 import org.drools.base.ClassObjectType;
 import org.drools.rule.GroupElement;
-import org.drools.rule.Pattern;
 import org.drools.rule.GroupElement.Type;
+import org.drools.rule.Pattern;
 
 import reactionruleml.AndInnerType;
 import reactionruleml.IndType;
+import reactionruleml.OidType;
 import reactionruleml.OpAtomType;
 import reactionruleml.RelType;
 import reactionruleml.SlotType;
-import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator.PropertyInfo;
-import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator.PropertyInfo.ValueType;
+import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo;
+import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo.ValueType;
 
 public class WhenPartAnalyzer {
 
 	private RuleMLBuilder builder = Drools2RuleMLTranslator.builder;
 	private Map<String, JAXBElement<?>> atoms = new HashMap<String, JAXBElement<?>>();
+	private VariableBindingsManager bindingsManager;
 
+	public WhenPartAnalyzer() {
+		this.bindingsManager = new VariableBindingsManager();
+	}
+	
 	/**
 	 * The main method for a transformation of the lhs-part of drools model.
 	 * Transforms the root-groupelement
@@ -85,10 +91,17 @@ public class WhenPartAnalyzer {
 		JAXBElement<OpAtomType> rel = processRel(pattern);
 		atomContent.add(rel);
 
+		// creates the oid if the relation is reified
+		if (pattern.getDeclaration() != null) {
+			JAXBElement<OidType> oid = builder.createOid(pattern
+					.getDeclaration().getIdentifier());
+			atomContent.add(oid);
+		}
+
 		// process all the constraints of the pattern
 		ConstraintsAnalyzer constraintsAnalyzer = new ConstraintsAnalyzer();
 		List<PropertyInfo> propertyInfos = constraintsAnalyzer
-				.processConstraints(pattern);
+				.processConstraints(pattern, this);
 
 		// convert the propertyinfos in slots
 		List<JAXBElement<SlotType>> slots = convertPropertyInfosInSlots(propertyInfos);
@@ -210,5 +223,13 @@ public class WhenPartAnalyzer {
 
 	public JAXBElement<?> getAtomFromName(String atomName) {
 		return this.atoms.get(atomName);
+	}
+
+	public VariableBindingsManager getBindingsManager() {
+		return bindingsManager;
+	}
+
+	public void setBindingsManager(VariableBindingsManager bindingsManager) {
+		this.bindingsManager = bindingsManager;
 	}
 }
