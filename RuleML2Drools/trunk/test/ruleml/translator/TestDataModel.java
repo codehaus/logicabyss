@@ -1,20 +1,21 @@
 package ruleml.translator;
 
 public class TestDataModel {
+
 	public static class Keep {
-		private String keeper;
+		private Person keeper;
 		private String item;
 
-		public Keep(String keeper, String item) {
+		public Keep(String item, Person keeper) {
 			this.keeper = keeper;
 			this.item = item;
 		}
 
-		public void setKeeper(String keeper) {
+		public void setKeeper(Person keeper) {
 			this.keeper = keeper;
 		}
 
-		public String getKeeper() {
+		public Person getKeeper() {
 			return keeper;
 		}
 
@@ -28,19 +29,19 @@ public class TestDataModel {
 	}
 
 	public static class Own {
-		private String owner;
+		private Person owner;
 		private String item;
 
-		public Own(String owner, String item) {
+		public Own(String item, Person owner) {
 			this.owner = owner;
 			this.item = item;
 		}
 
-		public void setOwner(String owner) {
+		public void setOwner(Person owner) {
 			this.owner = owner;
 		}
 
-		public String getOwner() {
+		public Person getOwner() {
 			return owner;
 		}
 
@@ -54,8 +55,8 @@ public class TestDataModel {
 	}
 
 	public static class Buy {
-		private String buyer;
-		private String seller;
+		private Person buyer;
+		private Person seller;
 		private String item;
 
 		@Override
@@ -96,25 +97,25 @@ public class TestDataModel {
 			return true;
 		}
 
-		public Buy(String buyer, String seller, String item) {
+		public Buy(Person buyer, String item, Person seller) {
 			this.setSeller(seller);
 			this.setBuyer(buyer);
 			this.setItem(item);
 		}
 
-		public void setSeller(String seller) {
+		public void setSeller(Person seller) {
 			this.seller = seller;
 		}
 
-		public String getSeller() {
+		public Person getSeller() {
 			return seller;
 		}
 
-		public void setBuyer(String buyer) {
+		public void setBuyer(Person buyer) {
 			this.buyer = buyer;
 		}
 
-		public String getBuyer() {
+		public Person getBuyer() {
 			return buyer;
 		}
 
@@ -129,29 +130,29 @@ public class TestDataModel {
 
 	public static class Sell {
 
-		private String seller;
-		private String buyer;
+		private Person seller;
+		private Person buyer;
 		private String item;
 
-		public Sell(String buyer, String seller, String item) {
+		public Sell(Person buyer, String item, Person seller) {
 			this.seller = seller;
 			this.buyer = buyer;
 			this.item = item;
 		}
 
-		public void setSeller(String seller) {
+		public void setSeller(Person seller) {
 			this.seller = seller;
 		}
 
-		public String getSeller() {
+		public Person getSeller() {
 			return seller;
 		}
 
-		public void setByuer(String buyer) {
+		public void setByuer(Person buyer) {
 			this.buyer = buyer;
 		}
 
-		public String getBuyer() {
+		public Person getBuyer() {
 			return buyer;
 		}
 
@@ -167,21 +168,24 @@ public class TestDataModel {
 	public static class Person {
 		private String name;
 		private int age;
-		
-		public Person (String name, int age ) {
+
+		public Person(int age, String name) {
 			this.name = name;
 			this.age = age;
 		}
-		
+
 		public String getName() {
 			return name;
 		}
+
 		public void setName(String name) {
 			this.name = name;
 		}
+
 		public int getAge() {
 			return age;
 		}
+
 		public void setAge(int age) {
 			this.age = age;
 		}
@@ -190,15 +194,19 @@ public class TestDataModel {
 	public static class Likes {
 		private String person;
 		private String object;
+
 		public String getPerson() {
 			return person;
 		}
+
 		public void setPerson(String person) {
 			this.person = person;
 		}
+
 		public String getObject() {
 			return object;
 		}
+
 		public void setObject(String object) {
 			this.object = object;
 		}

@@ -43,66 +43,7 @@ public class Drools2RuleMLTranslator {
 
 	public static RuleMLBuilder builder = new RuleMLBuilder();
 
-	public static class PropertyInfo {
-		private String name;
-		private String value;
-		private String var;
-		private ValueType type;
-		private boolean active = true;;
-		private Class clazz;
 
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public String getValue() {
-			return value;
-		}
-
-		public void setValue(String value) {
-			this.value = value;
-		}
-
-		public Class getClazz() {
-			return clazz;
-		}
-
-		public void setClazz(Class clazz) {
-			this.clazz = clazz;
-		}
-
-		public void setVar(String var) {
-			this.var = var;
-		}
-
-		public String getVar() {
-			return var;
-		}
-
-		public void setType(ValueType type) {
-			this.type = type;
-		}
-
-		public ValueType getType() {
-			return type;
-		}
-
-		public void setActive(boolean active) {
-			this.active = active;
-		}
-
-		public boolean isActive() {
-			return active;
-		}
-
-		public enum ValueType {
-			VAR, IND, DATA
-		}
-	}
 
 	/**
 	 * Helper method for reading the knowledge base
