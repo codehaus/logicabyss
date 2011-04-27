@@ -37,13 +37,8 @@ import reactionruleml.ThenType;
 public class Drools2RuleMLTranslator {
 
 	// This are the possible types for a rule or query in drools
-	public enum RuleStyle {
-		ASSERT, RETRACT, QUERY;
-	}
 
 	public static RuleMLBuilder builder = new RuleMLBuilder();
-
-
 
 	/**
 	 * Helper method for reading the knowledge base
@@ -110,8 +105,7 @@ public class Drools2RuleMLTranslator {
 						.processThenPart(pkgDescr.getRules().get(0)
 								.getConsequence().toString());
 
-				result += translator.wrapElement(whenPart, thenPart,
-						thenPartAnalyzer.getRuleStyle());
+				result += translator.wrapElement(whenPart, thenPart);
 			}
 		}
 		return result;
@@ -127,32 +121,20 @@ public class Drools2RuleMLTranslator {
 	 * @return Serialized RuleML
 	 */
 	private String wrapElement(JAXBElement<?> whenPart,
-			JAXBElement<?> thenPart, RuleStyle ruleStyle) {
+			JAXBElement<?> thenPart) {
 		// create the wrapper for the current use case ( RuleML ->
 		// Assert/Retract/Query -> Rule -> If , Do)
 		JAXBElement<IfType> ifType = builder
 				.createIf(new JAXBElement<?>[] { whenPart });
 
-		JAXBElement<?> assertOrRetract = null;
-		if (ruleStyle == RuleStyle.ASSERT) {
-			assertOrRetract = builder
-					.createAssert(new JAXBElement<?>[] { thenPart });
-		} else if (ruleStyle == RuleStyle.RETRACT) {
-			assertOrRetract = builder
-					.createRetract(new JAXBElement<?>[] { thenPart });
-		}
-
-		// JAXBElement<ThenType> thenType = builder
-		// .createThen(new JAXBElement<?>[] { thenPart });
-
 		JAXBElement<DoType> doType = builder
-				.createDo(new JAXBElement<?>[] { assertOrRetract });
+				.createDo(new JAXBElement<?>[] { thenPart });
 
 		JAXBElement<RuleType> ruleType = builder
 				.createRule(new JAXBElement<?>[] { ifType, doType });
 
 		JAXBElement<?> ruleMLContent = builder
-					.createAssert(new JAXBElement<?>[] { ruleType });
+				.createAssert(new JAXBElement<?>[] { ruleType });
 
 		JAXBElement<RuleMLType> ruleML = builder
 				.createRuleML(new JAXBElement<?>[] { ruleMLContent });
