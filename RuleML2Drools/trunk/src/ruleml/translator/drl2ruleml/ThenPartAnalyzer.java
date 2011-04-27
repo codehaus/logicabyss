@@ -13,32 +13,30 @@ import org.drools.rule.builder.dialect.java.parser.JavaLexer;
 
 import reactionruleml.AtomType;
 import reactionruleml.IndType;
+import reactionruleml.OidType;
 import reactionruleml.RelType;
 import reactionruleml.SlotType;
-import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator.RuleStyle;
 import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo;
 
 public class ThenPartAnalyzer {
 
-	private RuleStyle ruleStyle;
 	private WhenPartAnalyzer whenPartAnalyzer;
 
 	public ThenPartAnalyzer(WhenPartAnalyzer whenPartAnalyzer) {
 		this.whenPartAnalyzer = whenPartAnalyzer;
 	}
 
-	public RuleStyle getRuleStyle() {
-		return ruleStyle;
-	}
 
 	JAXBElement<?> processThenPart(String consequence) {
 		try {
 			if (consequence.contains("insert")) {
-				this.ruleStyle = RuleStyle.ASSERT;
-				return createInsert(consequence);
+				JAXBElement<?> thenPart = createInsert(consequence);
+				return Drools2RuleMLTranslator.builder
+						.createAssert(new JAXBElement<?>[] { thenPart });
 			} else if (consequence.contains("retract")) {
-				this.ruleStyle = RuleStyle.RETRACT;
-				return createRetract(consequence);
+				JAXBElement<?> thenPart = createRetract(consequence);
+				return Drools2RuleMLTranslator.builder
+						.createRetract(new JAXBElement<?>[] { thenPart });
 			} else {
 				throw new IllegalStateException(
 						"Can not process the then part because it is not an insert or retract");
@@ -57,7 +55,11 @@ public class ThenPartAnalyzer {
 					"The retract statement in the Then-part does not match the pattern: retract ($Var)");
 		}
 
-		return whenPartAnalyzer.getAtomFromName(tokens.get(0).getText());
+		JAXBElement<OidType> oid = Drools2RuleMLTranslator.builder.createOid(tokens.get(0)
+				.getText());
+
+		
+		return Drools2RuleMLTranslator.builder.createAtom(new JAXBElement<?>[]{oid});
 	}
 
 	private JAXBElement<?> createInsert(String insert)
@@ -114,8 +116,10 @@ public class ThenPartAnalyzer {
 					slotValue = Drools2RuleMLTranslator.builder
 							.createInd(value);
 				} else {
-					// value is a variable. Check if the variable is in the bound vars
-					PropertyInfo propertyInfo = whenPartAnalyzer.getBindingsManager().get(value); 
+					// value is a variable. Check if the variable is in the
+					// bound vars
+					PropertyInfo propertyInfo = whenPartAnalyzer
+							.getBindingsManager().get(value);
 					if (propertyInfo != null && propertyInfo.getValue() != null) {
 						value = propertyInfo.getValue();
 					}
