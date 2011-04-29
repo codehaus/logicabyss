@@ -11,9 +11,31 @@ public class VariableBindingsManager {
 		private String name;
 		private String value;
 		private String var;
-		private ValueType type;
+		private ValueType type = ValueType.VAR;
 		private boolean active = true;;
 		private String clazz;
+
+		@Override
+		public boolean equals(Object obj) {
+			try {
+				PropertyInfo propertyInfo = (PropertyInfo) obj;
+
+				if (var != null && propertyInfo.getVar() != null
+						&& var.equals(propertyInfo.getVar())) {
+					return true;
+				}
+
+				if (name != null && clazz != null
+						&& propertyInfo.getName() != null
+						&& propertyInfo.getClazz() != null
+						&& name.equals(propertyInfo.getName())
+						&& clazz.equals(propertyInfo.getClazz())) {
+					return true;
+				}
+			} finally {
+			}
+			return false;
+		}
 
 		public String getName() {
 			return name;
@@ -28,6 +50,11 @@ public class VariableBindingsManager {
 		}
 
 		public void setValue(String value) {
+			if (value != null) {
+				setType(ValueType.IND);
+			} else {
+				setType(ValueType.VAR);
+			}
 			this.value = value;
 		}
 
@@ -47,7 +74,7 @@ public class VariableBindingsManager {
 			return var;
 		}
 
-		public void setType(ValueType type) {
+		private void setType(ValueType type) {
 			this.type = type;
 		}
 
@@ -68,41 +95,37 @@ public class VariableBindingsManager {
 		}
 	}
 
-
-//	public PropertyInfo getFromFieldName(String fieldName) {
-//		return boundVarsOnFieldName.get(fieldName);
-//	}
-//
-//	public PropertyInfo getFromDeclaration(String declaration) {
-//		return boundVarsOnDeclaration.get(declaration);
-//	}
-	
-	public PropertyInfo get(String key) {
-		if (boundVarsOnFieldName.containsKey(key)) {
-			return boundVarsOnFieldName.get(key);
-		}
-		
-		if (boundVarsOnDeclaration.containsKey(key)) {
-			return boundVarsOnDeclaration.get(key);
-		}
-		
-		return null;
+	public PropertyInfo get(String fieldName, String clazz) {
+		return boundVarsOnFieldName.get(clazz + "_" + fieldName);
 	}
-	
-	public boolean containsKey (String key) {
-		if (boundVarsOnFieldName.containsKey(key) || boundVarsOnDeclaration.containsKey(key)) {
+
+	public PropertyInfo get(String declaration) {
+		return boundVarsOnDeclaration.get(declaration);
+	}
+
+	public boolean containsKey(String key) {
+		if (boundVarsOnDeclaration.containsKey(key)) {
 			return true;
 		} else {
 			return false;
 		}
 	}
-	
-	public void put(PropertyInfo propertyInfo) {
-		
-		if (propertyInfo.getName() != null) {
-			boundVarsOnFieldName.put(propertyInfo.getName(), propertyInfo);
+
+	public boolean containsKey(String fieldName, String clazz) {
+		if (boundVarsOnFieldName.containsKey(clazz + "_" + fieldName)) {
+			return true;
+		} else {
+			return false;
 		}
-		
+	}
+
+	public void put(PropertyInfo propertyInfo) {
+
+		if (propertyInfo.getName() != null) {
+			boundVarsOnFieldName.put(propertyInfo.getClazz() + "_"
+					+ propertyInfo.getName(), propertyInfo);
+		}
+
 		if (propertyInfo.getVar() != null) {
 			boundVarsOnDeclaration.put(propertyInfo.getVar(), propertyInfo);
 		}

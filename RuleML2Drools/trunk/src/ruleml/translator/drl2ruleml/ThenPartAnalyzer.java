@@ -14,9 +14,11 @@ import org.drools.rule.builder.dialect.java.parser.JavaLexer;
 import reactionruleml.AtomType;
 import reactionruleml.IndType;
 import reactionruleml.OidType;
+import reactionruleml.OpAtomType;
 import reactionruleml.RelType;
 import reactionruleml.SlotType;
 import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo;
+import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo.ValueType;
 
 public class ThenPartAnalyzer {
 
@@ -25,7 +27,6 @@ public class ThenPartAnalyzer {
 	public ThenPartAnalyzer(WhenPartAnalyzer whenPartAnalyzer) {
 		this.whenPartAnalyzer = whenPartAnalyzer;
 	}
-
 
 	JAXBElement<?> processThenPart(String consequence) {
 		try {
@@ -55,11 +56,11 @@ public class ThenPartAnalyzer {
 					"The retract statement in the Then-part does not match the pattern: retract ($Var)");
 		}
 
-		JAXBElement<OidType> oid = Drools2RuleMLTranslator.builder.createOid(tokens.get(0)
-				.getText());
+		JAXBElement<OidType> oid = Drools2RuleMLTranslator.builder
+				.createOid(tokens.get(0).getText());
 
-		
-		return Drools2RuleMLTranslator.builder.createAtom(new JAXBElement<?>[]{oid});
+		return Drools2RuleMLTranslator.builder
+				.createAtom(new JAXBElement<?>[] { oid });
 	}
 
 	private JAXBElement<?> createInsert(String insert)
@@ -95,37 +96,18 @@ public class ThenPartAnalyzer {
 
 			// create the list with elements, the content of the atom relation
 			List<JAXBElement<?>> jaxbElements = new ArrayList<JAXBElement<?>>();
-			RelType rel = Drools2RuleMLTranslator.builder.createRel(relName);
-			jaxbElements.add(Drools2RuleMLTranslator.builder.getFactory()
-					.createRel(rel));
+			RelType relType = Drools2RuleMLTranslator.builder.createRel(relName);
+			jaxbElements.add(Drools2RuleMLTranslator.builder.createOp(relType));
 
 			// iterate over the class properties
 			for (int i = 0; i < classProperties.size(); i++) {
-				// set the slot name
+				// get the slot name
 				JAXBElement<IndType> slotName = Drools2RuleMLTranslator.builder
 						.createInd(classProperties.get(i));
 
-				// set the slot value
-				JAXBElement<?> slotValue = null;
-				String value = dataFromInsert.get(i).getText();
-
-				if (value.contains("\"")) {
-					// value is a constant
-
-					value = value.replace("\"", "");
-					slotValue = Drools2RuleMLTranslator.builder
-							.createInd(value);
-				} else {
-					// value is a variable. Check if the variable is in the
-					// bound vars
-					PropertyInfo propertyInfo = whenPartAnalyzer
-							.getBindingsManager().get(value);
-					if (propertyInfo != null && propertyInfo.getValue() != null) {
-						value = propertyInfo.getValue();
-					}
-					slotValue = Drools2RuleMLTranslator.builder
-							.createVar(value);
-				}
+				// get the slot value
+				JAXBElement<?> slotValue = getSlotValue(dataFromInsert.get(i)
+						.getText());
 
 				// create slot
 				JAXBElement<SlotType> slot = Drools2RuleMLTranslator.builder
@@ -139,6 +121,29 @@ public class ThenPartAnalyzer {
 							.toArray(new JAXBElement<?>[jaxbElements.size()]));
 			return atom;
 		}
+	}
+
+	private JAXBElement<?> getSlotValue(String value) {
+		// set the slot value
+		JAXBElement<?> slotValue = null;
+
+		PropertyInfo propertyInfo = whenPartAnalyzer.getBindingsManager().get(
+				value);
+		if (propertyInfo == null) {
+			// value is a constant
+			value = value.replace("\"", "");
+			slotValue = Drools2RuleMLTranslator.builder.createInd(value);
+		} else {
+			if (propertyInfo.getType().equals(ValueType.IND)) {
+				slotValue = Drools2RuleMLTranslator.builder
+						.createInd(propertyInfo.getValue());
+			} else {
+				slotValue = Drools2RuleMLTranslator.builder
+						.createVar(propertyInfo.getVar());
+			}
+		}
+
+		return slotValue;
 	}
 
 	private List<CommonToken> getTokensFromThenPart(String insert) {
