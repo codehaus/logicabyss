@@ -30,7 +30,7 @@ public class WhenPartAnalyzer {
 	public WhenPartAnalyzer() {
 		this.bindingsManager = new VariableBindingsManager();
 	}
-	
+
 	/**
 	 * The main method for a transformation of the lhs-part of drools model.
 	 * Transforms the root-groupelement
@@ -96,6 +96,11 @@ public class WhenPartAnalyzer {
 			JAXBElement<OidType> oid = builder.createOid(pattern
 					.getDeclaration().getIdentifier());
 			atomContent.add(oid);
+
+			// add to bound vars
+			PropertyInfo propertyInfo = new PropertyInfo();
+			propertyInfo.setVar(pattern.getDeclaration().getIdentifier());
+			getBindingsManager().put(propertyInfo);
 		}
 
 		// process all the constraints of the pattern
@@ -199,7 +204,7 @@ public class WhenPartAnalyzer {
 		for (String property : properties) {
 			// create the slot
 			result.add(builder.createSlot(builder.createInd(property),
-					builder.createVar("")));
+					builder.createVar(builder.createUniqueVar())));
 		}
 
 		return result;

@@ -36,6 +36,7 @@ import reactionruleml.VarType;
 
 public class RuleMLBuilder {
 	private ObjectFactory factory = new ObjectFactory();
+	private int uniqueVarNum = 1;
 
 	public JAXBElement<SlotType> createSlot(JAXBElement<?> slotName,
 			JAXBElement<?> slotValue) {
@@ -46,6 +47,12 @@ public class RuleMLBuilder {
 	}
 
 	public JAXBElement<VarType> createVar(String content) {
+		// transform the content: if $i -> I
+		if (content.startsWith("$")) {
+			content = content.substring(1);
+		}
+		content = content.substring(0, 1).toUpperCase() + content.substring(1);
+
 		VarType varType = factory.createVarType();
 		varType.getContent().add(content);
 		return factory.createVar(varType);
@@ -109,6 +116,9 @@ public class RuleMLBuilder {
 	}
 
 	public RelType createRel(String content) {
+		// transform the name of the relation: to lower case
+		content = content.substring(0,1).toLowerCase() + content.substring(1);
+		
 		RelType relType = factory.createRelType();
 		relType.getContent().add(content);
 		return relType;
@@ -119,7 +129,7 @@ public class RuleMLBuilder {
 		oidType.setVar(createVar(identifier).getValue());
 		return factory.createOid(oidType);
 	}
-	
+
 	public JAXBElement<OpAtomType> createOp(RelType relType) {
 		OpAtomType opAtomType = factory.createOpAtomType();
 		opAtomType.setRel(relType);
@@ -219,6 +229,18 @@ public class RuleMLBuilder {
 		}
 
 		return result;
+	}
+
+	String createUniqueVar() {
+		// Random random = new Random();
+		// int unique;
+		// do {
+		// unique = random.nextInt(1000);
+		// } while (this.uniqueVars.contains(unique));
+		//
+		// uniqueVars.add(new Integer(unique));
+
+		return "VAR" + uniqueVarNum++;
 	}
 
 	public ObjectFactory getFactory() {

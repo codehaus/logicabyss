@@ -25,24 +25,26 @@ import reactionruleml.IndType;
 import reactionruleml.RelType;
 import reactionruleml.VarType;
 import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo;
-import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo.ValueType;
 
 public class ConstraintsAnalyzer {
-	
+
 	private List<JAXBElement<?>> other = new ArrayList<JAXBElement<?>>();
-	private int uniqueVarNum = 1;
 	private WhenPartAnalyzer whenPartAnalyzer;
-	
-	public List getOther () {
+
+	public List getOther() {
 		return this.other;
 	}
-	
+
 	/**
 	 * Processes all the constrains of the pattern
-	 * @param pattern The pattern that is being analyzed
-	 * @return List of property informations that contain data about the constraints 
+	 * 
+	 * @param pattern
+	 *            The pattern that is being analyzed
+	 * @return List of property informations that contain data about the
+	 *         constraints
 	 */
-	public List<PropertyInfo> processConstraints(Pattern pattern, WhenPartAnalyzer whenPartAnalyzer) {
+	public List<PropertyInfo> processConstraints(Pattern pattern,
+			WhenPartAnalyzer whenPartAnalyzer) {
 		this.whenPartAnalyzer = whenPartAnalyzer;
 		// the result list
 		List<PropertyInfo> propertyInfos = new ArrayList<PropertyInfo>();
@@ -55,7 +57,7 @@ public class ConstraintsAnalyzer {
 				propertyInfo = processDeclaration(constraint);
 			} else if (constraint instanceof LiteralConstraint) {
 				propertyInfo = processLiteralConstraint(constraint);
-				((LiteralConstraint)constraint).getEvaluator();
+				((LiteralConstraint) constraint).getEvaluator();
 			} else if (constraint instanceof VariableConstraint) {
 				propertyInfo = processVarConstraint(constraint);
 			} else if (constraint instanceof OrConstraint) {
@@ -69,9 +71,12 @@ public class ConstraintsAnalyzer {
 				// }
 				// }
 			}
-			
+
+			// if the property is already in the list merge the value, else add
 			if (propertyInfo != null && !propertyInfos.contains(propertyInfo)) {
 				propertyInfos.add(propertyInfo);
+			} else {
+				propertyInfos.get(propertyInfos.indexOf(propertyInfo)).setValue(propertyInfo.getValue());
 			}
 		}
 
@@ -92,7 +97,6 @@ public class ConstraintsAnalyzer {
 		PropertyInfo propertyInfo = new PropertyInfo();
 		propertyInfo.setName(field.getFieldName());
 		propertyInfo.setVar(declaration.getIdentifier());
-		propertyInfo.setType(ValueType.VAR);
 		propertyInfo.setClazz(field.getClassName());
 		whenPartAnalyzer.getBindingsManager().put(propertyInfo);
 		return propertyInfo;
@@ -110,20 +114,29 @@ public class ConstraintsAnalyzer {
 		ClassFieldReader field = (ClassFieldReader) literalConstraint
 				.getFieldExtractor();
 
-		Evaluator evaluator = literalConstraint.getEvaluator();;
+		Evaluator evaluator = literalConstraint.getEvaluator();
+
 		String relationName = "";
-		
-		if (evaluator instanceof StringEqualEvaluator || evaluator instanceof IntegerEqualEvaluator || evaluator instanceof ObjectEqualEvaluator) {
-			PropertyInfo propertyInfo = null;
-			if (whenPartAnalyzer.getBindingsManager().containsKey(field.getFieldName())) {
-				propertyInfo = whenPartAnalyzer.getBindingsManager().get(field.getFieldName());
-			} else {
-				propertyInfo = new PropertyInfo();
-				propertyInfo.setName(field.getFieldName());
+
+		if (evaluator instanceof StringEqualEvaluator
+				|| evaluator instanceof IntegerEqualEvaluator
+				|| evaluator instanceof ObjectEqualEvaluator) {
+
+			// get field name and value from the constraint 
+			String fieldName = field.getFieldName();
+			String value = literalConstraint.getField().getValue().toString();
+
+			// create the new property Info
+			PropertyInfo propertyInfo = new PropertyInfo();
+			propertyInfo.setValue(value);
+			propertyInfo.setName(fieldName);
+			propertyInfo.setClazz(field.getClassName());
+
+			// initiate the bound var in the binding manager
+			if (whenPartAnalyzer.getBindingsManager().containsKey(fieldName,value)) {
+				whenPartAnalyzer.getBindingsManager().get(fieldName,value).setValue(value);
 			}
-			propertyInfo.setValue(literalConstraint.getField().getValue()
-					.toString());
-			propertyInfo.setType(ValueType.IND);
+
 			return propertyInfo;
 		} else if (evaluator instanceof IntegerLessEvaluator) {
 			relationName = "LessThan";
@@ -136,42 +149,34 @@ public class ConstraintsAnalyzer {
 		}
 
 		List<JAXBElement<?>> content = new ArrayList<JAXBElement<?>>();
-		
+
 		// create the relation
-		RelType relType = Drools2RuleMLTranslator.builder.createRel(relationName);
-		JAXBElement<?> opAtom = Drools2RuleMLTranslator.builder.createOp(relType);
+		RelType relType = Drools2RuleMLTranslator.builder
+				.createRel(relationName);
+		JAXBElement<?> opAtom = Drools2RuleMLTranslator.builder
+				.createOp(relType);
 		content.add(opAtom);
-		
+
 		// create the data in the relation
-		String var = createUniqueVar();
-		JAXBElement<VarType> varType = Drools2RuleMLTranslator.builder.createVar(var);
+		String var = Drools2RuleMLTranslator.builder.createUniqueVar();
+		JAXBElement<VarType> varType = Drools2RuleMLTranslator.builder
+				.createVar(var);
 		content.add(varType);
-		
-		JAXBElement<IndType> indType = Drools2RuleMLTranslator.builder.createInd(literalConstraint.getField().getValue().toString());
+
+		JAXBElement<IndType> indType = Drools2RuleMLTranslator.builder
+				.createInd(literalConstraint.getField().getValue().toString());
 		content.add(indType);
-		
+
 		// create new Atom with the the other relation
-		JAXBElement<AtomType> createAtom = Drools2RuleMLTranslator.builder.createAtom(content.toArray(new JAXBElement<?>[content.size()]));
+		JAXBElement<AtomType> createAtom = Drools2RuleMLTranslator.builder
+				.createAtom(content.toArray(new JAXBElement<?>[content.size()]));
 
 		this.other.add(createAtom);
-		
+
 		PropertyInfo propertyInfo = new PropertyInfo();
 		propertyInfo.setName(field.getFieldName());
 		propertyInfo.setVar(var);
-		propertyInfo.setType(ValueType.VAR);
 		return propertyInfo;
-	}
-
-	private String createUniqueVar() {
-//		Random random = new Random();
-//		int unique;
-//		do {
-//			unique = random.nextInt(1000);
-//		} while (this.uniqueVars.contains(unique));
-//		
-//		uniqueVars.add(new Integer(unique));
-		
-		return "VAR" + uniqueVarNum++;
 	}
 
 	/**
@@ -188,24 +193,27 @@ public class ConstraintsAnalyzer {
 
 		if (variableConstraint.getRequiredDeclarations().length > 0) {
 
-			PropertyInfo propertyInfo = null;
-			if (whenPartAnalyzer.getBindingsManager().containsKey(field.getFieldName())) {
-				propertyInfo = whenPartAnalyzer.getBindingsManager().get(field.getFieldName());
-				
-			} else {
-				propertyInfo = new PropertyInfo();
-				propertyInfo.setName(field.getFieldName());
-				propertyInfo.setType(ValueType.VAR);
-				propertyInfo.setVar(variableConstraint
-						.getRequiredDeclarations()[0].getIdentifier());
+			String var = variableConstraint.getRequiredDeclarations()[0]
+					.getIdentifier();
+
+			PropertyInfo propertyInfo = new PropertyInfo();
+			propertyInfo.setVar(var);
+			propertyInfo.setName(field.getFieldName());
+			propertyInfo.setClazz(field.getClassName());
+
+			if (whenPartAnalyzer.getBindingsManager().containsKey(var)) {
+				propertyInfo.setValue(whenPartAnalyzer.getBindingsManager()
+						.get(var).getValue());
 			}
-			
+
 			return propertyInfo;
 		}
 
 		throw new RuntimeException("VariableConstratint is empty !!!"
 				+ variableConstraint);
 	}
+
+
 
 	// /**
 	// * Processes OrConstraint from pattern

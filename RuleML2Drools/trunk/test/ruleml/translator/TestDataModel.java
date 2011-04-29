@@ -3,19 +3,19 @@ package ruleml.translator;
 public class TestDataModel {
 
 	public static class Keep {
-		private Person keeper;
+		private String keeper;
 		private String item;
 
-		public Keep(String item, Person keeper) {
+		public Keep(String item, String keeper) {
 			this.keeper = keeper;
 			this.item = item;
 		}
 
-		public void setKeeper(Person keeper) {
+		public void setKeeper(String keeper) {
 			this.keeper = keeper;
 		}
 
-		public Person getKeeper() {
+		public String getKeeper() {
 			return keeper;
 		}
 
@@ -29,19 +29,19 @@ public class TestDataModel {
 	}
 
 	public static class Own {
-		private Person owner;
+		private String owner;
 		private String item;
 
-		public Own(String item, Person owner) {
+		public Own(String item, String owner) {
 			this.owner = owner;
 			this.item = item;
 		}
 
-		public void setOwner(Person owner) {
+		public void setOwner(String owner) {
 			this.owner = owner;
 		}
 
-		public Person getOwner() {
+		public String getOwner() {
 			return owner;
 		}
 
@@ -55,8 +55,8 @@ public class TestDataModel {
 	}
 
 	public static class Buy {
-		private Person buyer;
-		private Person seller;
+		private String buyer;
+		private String seller;
 		private String item;
 
 		@Override
@@ -97,25 +97,25 @@ public class TestDataModel {
 			return true;
 		}
 
-		public Buy(Person buyer, String item, Person seller) {
+		public Buy(String buyer, String item, String seller) {
 			this.setSeller(seller);
 			this.setBuyer(buyer);
 			this.setItem(item);
 		}
 
-		public void setSeller(Person seller) {
+		public void setSeller(String seller) {
 			this.seller = seller;
 		}
 
-		public Person getSeller() {
+		public String getSeller() {
 			return seller;
 		}
 
-		public void setBuyer(Person buyer) {
+		public void setBuyer(String buyer) {
 			this.buyer = buyer;
 		}
 
-		public Person getBuyer() {
+		public String getBuyer() {
 			return buyer;
 		}
 

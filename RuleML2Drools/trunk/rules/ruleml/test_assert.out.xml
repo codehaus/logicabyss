@@ -1,1 +1,2 @@
-likes("subject""Mary","object""wine").
+likes(subject->"John",object->X):-likes(subject->X,object->"wine").
+likes(subject->"Mary",object->"wine").
