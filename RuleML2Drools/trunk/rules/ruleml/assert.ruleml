@@ -10,7 +10,7 @@
                         </op>
                         <slot>
                             <Ind>buyer</Ind>
-                            <Ind>Ti6o</Ind>
+                            <Ind>Tisho</Ind>
                         </slot>
                         <slot>
                             <Ind>item</Ind>
@@ -27,7 +27,7 @@
                         </op>
                         <slot>
                             <Ind>keeper</Ind>
-                            <Ind>Ti6o</Ind>
+                            <Ind>Tisho</Ind>
                         </slot>
                         <slot>
                             <Ind>item</Ind>
@@ -48,7 +48,7 @@
                         </slot>
                         <slot>
                             <Ind>owner</Ind>
-                            <Ind>Ti6o</Ind>
+                            <Ind>Tisho</Ind>
                         </slot>
                     </Atom>
                 </Assert>

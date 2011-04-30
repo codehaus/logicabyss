@@ -134,11 +134,9 @@ public class RuleML2ProvaTranslator extends AbstractTransformer {
 				// Extract complex objects from String
 				String output = provaMessage.toString();
 			
-				System.out.println(output);
-				
-				ProvaList list = new String2ProvaList().createProvaList(output);
+//				ProvaList list = new String2ProvaList().createProvaList(output);
 
-				return list;
+				return output;
 
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -21,15 +21,16 @@ import reactionruleml.SlotType;
 import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo;
 import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo.ValueType;
 
+/**
+ * Analyzer for the WHEN-Part of a drools rule
+ * 
+ * @author jabarski
+ */
 public class WhenPartAnalyzer {
 
 	private RuleMLBuilder builder = Drools2RuleMLTranslator.builder;
 	private Map<String, JAXBElement<?>> atoms = new HashMap<String, JAXBElement<?>>();
-	private VariableBindingsManager bindingsManager;
-
-	public WhenPartAnalyzer() {
-		this.bindingsManager = new VariableBindingsManager();
-	}
+	private VariableBindingsManager bindingsManager = new VariableBindingsManager();
 
 	/**
 	 * The main method for a transformation of the lhs-part of drools model.
@@ -40,6 +41,11 @@ public class WhenPartAnalyzer {
 	 * @param thenPart
 	 */
 	JAXBElement<?> processGroupElement(GroupElement groupElement) {
+		
+		// check for emtpy when part
+		if (groupElement.getChildren().size() == 0) {
+			return null;
+		}
 
 		// collector for all the atoms in the when part
 		List<JAXBElement<?>> elements = new ArrayList<JAXBElement<?>>();
@@ -230,10 +236,18 @@ public class WhenPartAnalyzer {
 		return this.atoms.get(atomName);
 	}
 
+	/**
+	 * Getter for the bindings manager
+	 * @return The binding manager
+	 */
 	public VariableBindingsManager getBindingsManager() {
 		return bindingsManager;
 	}
 
+	/**
+	 * Setter for the binding manager.
+	 * @param bindingsManager The binding manager to be set.
+	 */
 	public void setBindingsManager(VariableBindingsManager bindingsManager) {
 		this.bindingsManager = bindingsManager;
 	}

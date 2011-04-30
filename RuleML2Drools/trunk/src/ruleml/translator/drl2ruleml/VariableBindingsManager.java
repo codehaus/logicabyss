@@ -3,6 +3,12 @@ package ruleml.translator.drl2ruleml;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class to manage the bound vars in a drools source for the translation.
+ * 
+ * @author jabarski
+ */
+
 public class VariableBindingsManager {
 	private Map<String, PropertyInfo> boundVarsOnFieldName = new HashMap<String, PropertyInfo>();
 	private Map<String, PropertyInfo> boundVarsOnDeclaration = new HashMap<String, PropertyInfo>();
