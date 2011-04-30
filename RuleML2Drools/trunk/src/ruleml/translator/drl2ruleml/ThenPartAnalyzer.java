@@ -14,41 +14,67 @@ import org.drools.rule.builder.dialect.java.parser.JavaLexer;
 import reactionruleml.AtomType;
 import reactionruleml.IndType;
 import reactionruleml.OidType;
-import reactionruleml.OpAtomType;
 import reactionruleml.RelType;
 import reactionruleml.SlotType;
 import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo;
 import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo.ValueType;
 
+/**
+ * Analyzer for the THEN-Part of a drools rule.
+ * 
+ * @author jabarski
+ */
 public class ThenPartAnalyzer {
 
+	// reference to the whenPartAnalyszer for the current rule
 	private WhenPartAnalyzer whenPartAnalyzer;
 
+	/**
+	 * Constructor
+	 */
 	public ThenPartAnalyzer(WhenPartAnalyzer whenPartAnalyzer) {
 		this.whenPartAnalyzer = whenPartAnalyzer;
 	}
 
-	JAXBElement<?> processThenPart(String consequence) {
+	JAXBElement<?>[] processThenPart(String consequence) {
 		try {
+			// split on the EOL to check the number of lines
+			String[] parts = consequence.split("\n");
+
+			JAXBElement<?>[] thenParts = new JAXBElement<?>[parts.length];
+
 			if (consequence.contains("insert")) {
-				JAXBElement<?> thenPart = createInsert(consequence);
-				return Drools2RuleMLTranslator.builder
-						.createAssert(new JAXBElement<?>[] { thenPart });
+				for (int i = 0; i < thenParts.length; i++) {
+					JAXBElement<?> insert = createInsert(parts[i]);
+					thenParts[i] = Drools2RuleMLTranslator.builder
+							.createAssert(new JAXBElement<?>[] { insert });
+				}
+
 			} else if (consequence.contains("retract")) {
-				JAXBElement<?> thenPart = createRetract(consequence);
-				return Drools2RuleMLTranslator.builder
-						.createRetract(new JAXBElement<?>[] { thenPart });
+				for (int i = 0; i < thenParts.length; i++) {
+					JAXBElement<?> retract = createRetract(parts[i]);
+					thenParts[i] = Drools2RuleMLTranslator.builder
+							.createRetract(new JAXBElement<?>[] { retract });
+				}
 			} else {
 				throw new IllegalStateException(
 						"Can not process the then part because it is not an insert or retract");
 			}
 
+			return thenParts;
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
 
+	/**
+	 * Creates retract from the consequence part
+	 * 
+	 * @param retract
+	 *            The line from the then part of a rule that contains retract.
+	 * @return RetractType element
+	 */
 	private JAXBElement<?> createRetract(String retract) {
 		List<CommonToken> tokens = getTokensFromThenPart(retract);
 		if (tokens.size() != 1) {
@@ -63,6 +89,13 @@ public class ThenPartAnalyzer {
 				.createAtom(new JAXBElement<?>[] { oid });
 	}
 
+	/**
+	 * Creates insert from the consequence part
+	 * 
+	 * @param insert
+	 *            The line from the then part of a rule that contains insert
+	 * @return AssertType element
+	 */
 	private JAXBElement<?> createInsert(String insert)
 			throws ClassNotFoundException {
 		// get the data from consequence insert
@@ -96,7 +129,8 @@ public class ThenPartAnalyzer {
 
 			// create the list with elements, the content of the atom relation
 			List<JAXBElement<?>> jaxbElements = new ArrayList<JAXBElement<?>>();
-			RelType relType = Drools2RuleMLTranslator.builder.createRel(relName);
+			RelType relType = Drools2RuleMLTranslator.builder
+					.createRel(relName);
 			jaxbElements.add(Drools2RuleMLTranslator.builder.createOp(relType));
 
 			// iterate over the class properties
@@ -123,6 +157,13 @@ public class ThenPartAnalyzer {
 		}
 	}
 
+	/**
+	 * Creates slot from the given value.
+	 * 
+	 * @param value
+	 *            The value of the field in slot.
+	 * @return SlotType element.
+	 */
 	private JAXBElement<?> getSlotValue(String value) {
 		// set the slot value
 		JAXBElement<?> slotValue = null;
@@ -146,6 +187,13 @@ public class ThenPartAnalyzer {
 		return slotValue;
 	}
 
+	/**
+	 * Parses the insert part and returns the java parts.
+	 * 
+	 * @param insert
+	 *            The line from the then part of a rule that contains insert
+	 * @return List with tha java tokens.
+	 */
 	private List<CommonToken> getTokensFromThenPart(String insert) {
 		List<CommonToken> result = new ArrayList<CommonToken>();
 		try {

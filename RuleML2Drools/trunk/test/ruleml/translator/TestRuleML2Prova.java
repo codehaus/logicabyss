@@ -1,12 +1,10 @@
 package ruleml.translator;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
+import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator;
 import ruleml.translator.ruleml2prova.RuleML2ProvaTranslator;
 import ws.prova.api2.ProvaCommunicator;
 import ws.prova.api2.ProvaCommunicatorImpl;
@@ -23,57 +21,55 @@ public class TestRuleML2Prova {
 		testXSL();
 	}
 
-	static void test2() {
-		final String rulebase = "rules/ruleml/assert.out.xml";
+	static void testXSL() {
 
-		String inputRules = "buy(\"Tisho\",\"laptop\",\"Amazon\"). \n" +
-				"keep(\"Tisho\",\"laptop\"). \n" +
-				":-solve(own(X,Y)).";
+		RuleML2ProvaTranslator ruleml2ProvaTranslator = new RuleML2ProvaTranslator();
+		ruleml2ProvaTranslator.setXSLT("resources/rrml2prova_1.0.xsl");
+
+		Drools2RuleMLTranslator drools2RuleMLTranslator = new Drools2RuleMLTranslator();
+		
+		try {
+
+			final String ruleBase = Util.readFileAsString("rules/drools/test_assert.drl");
+
+			// Drools -> ruleML translation
+			Object ruleML = drools2RuleMLTranslator.doTransform(ruleBase, "UTF-8");
+
+			System.out.println(ruleML);
+			
+			// RuleML -> Prova translation
+			Object result = ruleml2ProvaTranslator.doTransform(ruleML, "UTF-8");
+
+			// execute prova on the rule base
+			test2(result.toString());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	static void test2(String ruleBase) {
+		String inputRules = ruleBase+ ":-solve(own(X,Y)).";
+
+		System.out.println(inputRules);
 
 		BufferedReader inRules = new BufferedReader(
 				new StringReader(inputRules));
 
-		comm = new ProvaCommunicatorImpl(kAgent, kPort, rulebase,
+		comm = new ProvaCommunicatorImpl(kAgent, kPort, null,
 				ProvaCommunicatorImpl.SYNC, null);
 
 		try {
-			List<ProvaSolution[]> solutions = comm.consultSync(inRules, "to-remove-later", new Object[] {});
-//			List<ProvaSolution[]> solutions = comm.getInitializationSolutions();
+			List<ProvaSolution[]> solutions = comm.consultSync(inRules,
+					"to-remove-later", new Object[] {});
 			printRusluts(solutions);
 		} catch (Exception unlikely) {
 			unlikely.printStackTrace();
 		}
 	}
 
-	// static void test1() {
-	// final String rulebase = "rules/prova/test.prova";
-	// String inputRules = "pappy(Person) :- happy(Person).";
-	// BufferedReader inRules = new BufferedReader(
-	// new StringReader(inputRules));
-	//
-	// comm = new ProvaCommunicatorImpl(kAgent, kPort, rulebase,
-	// ProvaCommunicatorImpl.SYNC, null);
-	//
-	// try {
-	// comm.consultSync(inRules, "to-remove-later", new Object[] {});
-	// } catch (Exception unlikely) {
-	// unlikely.printStackTrace();
-	// }
-	//
-	// String input = ":- solve(happy(Person)).\n :- solve(pappy(Person)).";
-	// BufferedReader in = new BufferedReader(new StringReader(input));
-	//
-	// try {
-	// List<ProvaSolution[]> resultSets = comm.consultSync(in, "goals",
-	// new Object[] {});
-	// printRusluts(resultSets);
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	// }
-
 	static void printRusluts(List<ProvaSolution[]> resultSets) {
-		System.out.println("Starting PrintResult *************");
+		System.out.println("**************  Print prova results *************");
 		for (ProvaSolution[] resultSet : resultSets) {
 			System.out.println("--- new ResultSet ---");
 			for (ProvaSolution provaSolution : resultSet) {
@@ -89,56 +85,5 @@ public class TestRuleML2Prova {
 				// System.out.println("Result : " + ans2);
 			}
 		}
-	}
-
-	public static String readFileAsString(String filePath)
-			throws java.io.IOException {
-		StringBuffer fileData = new StringBuffer(1000);
-		BufferedReader reader = new BufferedReader(new FileReader(filePath));
-		char[] buf = new char[1024];
-		int numRead = 0;
-		while ((numRead = reader.read(buf)) != -1) {
-			String readData = String.valueOf(buf, 0, numRead);
-			fileData.append(readData);
-			buf = new char[1024];
-		}
-		reader.close();
-		return fileData.toString();
-	}
-
-	public static void testXSL() {
-
-		test2();
-
-		// RuleML2ProvaTranslator ruleml2ProvaTranslator = new
-		// RuleML2ProvaTranslator();
-		// Prova2RuleMLTranslator prova2RuleMLTranslator = new
-		// Prova2RuleMLTranslator();
-		//
-		// try {
-		// File file = new File("test.txt");
-		// System.out.println(file.getCanonicalPath());
-		//
-		// String srcRuleML = readFileAsString("rules/ruleml/assert.ruleml");
-		// ruleml2ProvaTranslator.setXSLT("resources/rrml2prova_1.0.xsl");
-		// Object result = ruleml2ProvaTranslator.doTransform(srcRuleML,
-		// "UTF-8");
-		//
-		// System.out.println(result);
-		//
-		// String resultProva = readFileAsString("result.prova");
-		// System.out.println(resultProva.equals(doTransform.toString()));
-		//
-		// String srcprovaML = readFileAsString("test.ruleml");
-		// Object doTransform = ml2ProvaTranslator.doTransform(srcprovaML,
-		// "UTF-8");
-		// System.out.println(doTransform);
-		// String resultProva = readFileAsString("result.prova");
-		//
-		// System.out.println(result.equals(doTransform.toString()));
-		//
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
 	}
 }

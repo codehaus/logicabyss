@@ -1,4 +1,4 @@
-package ruleml.translator.ruleml2prova;
+package ruleml.translator.prova2ruleml;
 
 import java.util.ArrayList;
 
@@ -33,7 +33,6 @@ public class Prova2RuleMLTranslator extends AbstractTransformer {
 
 	public Prova2RuleMLTranslator() {
 		super();
-		this.registerSourceType(Object.class);
 	}
 
 	private boolean isNumeric(String str) {

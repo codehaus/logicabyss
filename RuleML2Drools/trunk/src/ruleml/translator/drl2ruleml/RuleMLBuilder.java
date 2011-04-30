@@ -34,6 +34,12 @@ import reactionruleml.ThenType;
 import reactionruleml.UpdateType;
 import reactionruleml.VarType;
 
+/**
+ * Class with functions to build JAXB-elements for the translation of
+ * drools rules.
+ * 
+ * @author jabarski
+ */
 public class RuleMLBuilder {
 	private ObjectFactory factory = new ObjectFactory();
 	private int uniqueVarNum = 1;
@@ -231,7 +237,7 @@ public class RuleMLBuilder {
 		return result;
 	}
 
-	String createUniqueVar() {
+	public String createUniqueVar() {
 		// Random random = new Random();
 		// int unique;
 		// do {

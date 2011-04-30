@@ -26,6 +26,12 @@ import reactionruleml.RelType;
 import reactionruleml.VarType;
 import ruleml.translator.drl2ruleml.VariableBindingsManager.PropertyInfo;
 
+/**
+ * Class with functions that analyzes the constraint of a pattern from a 
+ * drools rule.
+ *  
+ * @author jabarski
+ */
 public class ConstraintsAnalyzer {
 
 	private List<JAXBElement<?>> other = new ArrayList<JAXBElement<?>>();
@@ -213,8 +219,6 @@ public class ConstraintsAnalyzer {
 				+ variableConstraint);
 	}
 
-
-
 	// /**
 	// * Processes OrConstraint from pattern
 	// *
@@ -225,5 +229,4 @@ public class ConstraintsAnalyzer {
 	// * @return The drools reader of the property for the declaration
 	// */
 	// private JAXBElement<SlotType> processOrConstraint(Object constraint) {}
-
 }

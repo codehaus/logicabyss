@@ -4,6 +4,8 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,52 +19,32 @@ import org.drools.builder.KnowledgeBuilderError;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
+import org.drools.compiler.DrlParser;
+import org.drools.compiler.DroolsParserException;
 import org.drools.definition.KnowledgePackage;
+import org.drools.io.Resource;
 import org.drools.io.ResourceFactory;
 import org.drools.lang.descr.PackageDescr;
 import org.drools.rule.GroupElement;
 import org.drools.rule.Rule;
+import org.mule.transformer.AbstractTransformer;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 import reactionruleml.DoType;
 import reactionruleml.IfType;
 import reactionruleml.RuleMLType;
 import reactionruleml.RuleType;
-import reactionruleml.ThenType;
 
 /**
  * Translator for Drools rules to RuleML
  * 
  * @author Jabarski
  */
-public class Drools2RuleMLTranslator {
-
-	// This are the possible types for a rule or query in drools
+public class Drools2RuleMLTranslator extends AbstractTransformer {
 
 	public static RuleMLBuilder builder = new RuleMLBuilder();
-
-	/**
-	 * Helper method for reading the knowledge base
-	 * 
-	 * @return The knowledge base red from file
-	 */
-	public static KnowledgeBase readKnowledgeBase(String fileName)
-			throws Exception {
-		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
-				.newKnowledgeBuilder();
-		kbuilder.add(ResourceFactory.newClassPathResource(fileName),
-				ResourceType.DRL);
-		KnowledgeBuilderErrors errors = kbuilder.getErrors();
-		if (errors.size() > 0) {
-			for (KnowledgeBuilderError error : errors) {
-				System.err.println(error);
-			}
-			throw new IllegalArgumentException("Could not parse knowledge.");
-		}
-		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-		return kbase;
-	}
-
+	
 	/**
 	 * The main entry point for the translation
 	 * 
@@ -72,10 +54,22 @@ public class Drools2RuleMLTranslator {
 	 *            The output of the drools parser in raw form
 	 * @return Serialized RuleML
 	 */
-	public static String translate(KnowledgeBase kbase, PackageDescr pkgDescr) {
-		Drools2RuleMLTranslator translator = new Drools2RuleMLTranslator();
+	@Override
+	public Object doTransform(Object src, String enc) {
 
-		String result = "";
+		// check the type of the object to transform
+		if (!(src instanceof String)) {
+			throw new IllegalStateException(
+					"The object to transform is not of the correct type String, "
+							+ src);
+		}
+		String ruleBase = (String) src;
+
+		// initiate
+		KnowledgeBase kbase = readKnowledgeBase(ruleBase);
+		PackageDescr pkgDescr = getPkgDescription(ruleBase);
+
+		List<JAXBElement<?>> content = new ArrayList<JAXBElement<?>>();
 
 		// get the packages from the knowledge base
 		Collection<KnowledgePackage> knowledgePackages = kbase
@@ -85,6 +79,9 @@ public class Drools2RuleMLTranslator {
 			// get the rules from the package
 			Collection<org.drools.definition.rule.Rule> rules = knowledgePackage
 					.getRules();
+
+			int i = 0;
+
 			// iterate over the rules in the package
 			for (org.drools.definition.rule.Rule rule : rules) {
 				// get the rule
@@ -101,47 +98,111 @@ public class Drools2RuleMLTranslator {
 				// process the RHS(Then part), and set the type
 				ThenPartAnalyzer thenPartAnalyzer = new ThenPartAnalyzer(
 						whenPartAnalyzer);
-				JAXBElement<?> thenPart = thenPartAnalyzer
-						.processThenPart(pkgDescr.getRules().get(0)
+				JAXBElement<?>[] thenPart = thenPartAnalyzer
+						.processThenPart(pkgDescr.getRules().get(i)
 								.getConsequence().toString());
 
-				result += translator.wrapElement(whenPart, thenPart);
+				JAXBElement<?>[] ruleType = wrapRule(whenPart, thenPart);
+				content.addAll(Arrays.asList(ruleType));
+
+				i++;
 			}
 		}
-		return result;
-	}
 
-	/**
-	 * Creates the wrapper on the group element
-	 * 
-	 * @param whenPart
-	 *            The when part of the drools source (LHS)
-	 * @param thenPart
-	 *            The then part of the drools source (RHS)
-	 * @return Serialized RuleML
-	 */
-	private String wrapElement(JAXBElement<?> whenPart,
-			JAXBElement<?> thenPart) {
-		// create the wrapper for the current use case ( RuleML ->
-		// Assert/Retract/Query -> Rule -> If , Do)
-		JAXBElement<IfType> ifType = builder
-				.createIf(new JAXBElement<?>[] { whenPart });
-
-		JAXBElement<DoType> doType = builder
-				.createDo(new JAXBElement<?>[] { thenPart });
-
-		JAXBElement<RuleType> ruleType = builder
-				.createRule(new JAXBElement<?>[] { ifType, doType });
-
-		JAXBElement<?> ruleMLContent = builder
-				.createAssert(new JAXBElement<?>[] { ruleType });
-
-		JAXBElement<RuleMLType> ruleML = builder
-				.createRuleML(new JAXBElement<?>[] { ruleMLContent });
+		JAXBElement<RuleMLType> ruleML = builder.createRuleML(content
+				.toArray(new JAXBElement<?>[content.size()]));
 
 		// serialize and return
 		return builder.marshal(ruleML, true);
 	}
+	
+	/**
+	 * Creates the wrapper Rule element
+	 * 
+	 * @param whenPart
+	 *            The when part of the drools rule (LHS)
+	 * @param thenPart
+	 *            The then part of the drools rule (RHS)
+	 * @return The RuleType element object
+	 */
+	private JAXBElement<?>[] wrapRule(JAXBElement<?> whenPart,
+			JAXBElement<?>[] thenPart) {
+
+		if (whenPart == null) {
+			return thenPart;
+		} else {
+			// -> Rule -> If , Do)
+			JAXBElement<IfType> ifType = builder
+					.createIf(new JAXBElement<?>[] { whenPart });
+
+			JAXBElement<DoType> doType = builder.createDo(thenPart);
+
+			JAXBElement<RuleType> ruleType = builder
+					.createRule(new JAXBElement<?>[] { ifType, doType });
+
+			JAXBElement<?> assertContent = builder
+					.createAssert(new JAXBElement<?>[] { ruleType });
+
+			return new JAXBElement<?>[]{assertContent};
+		}
+	}
+	
+	/**
+	 * Helper method for reading the knowledge base
+	 * 
+	 * @return The knowledge base red from file
+	 */
+	private KnowledgeBase readKnowledgeBase(String ruleBase) {
+
+		final StringReader sr = new StringReader(ruleBase);
+		final Resource resource = ResourceFactory.newReaderResource(sr);
+
+		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory
+				.newKnowledgeBuilder();
+
+		kbuilder.add(resource, ResourceType.DRL);
+
+		KnowledgeBuilderErrors errors = kbuilder.getErrors();
+		if (errors.size() > 0) {
+			for (KnowledgeBuilderError error : errors) {
+				System.err.println(error);
+			}
+			throw new IllegalArgumentException("Could not parse knowledge.");
+		}
+		KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
+		kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
+		return kbase;
+	}
+	
+
+	/**
+	 * Helper method for reading the package description from resource
+	 * 
+	 * @param ruleBase
+	 *            The drools ruleBase as a string
+	 * @return The packageDescription
+	 */
+	private PackageDescr getPkgDescription(String ruleBase) {
+		final StringReader sr = new StringReader(ruleBase);
+		final Resource resource = ResourceFactory.newReaderResource(sr);
+		final DrlParser parser = new DrlParser();
+		PackageDescr pkgDescr;
+		try {
+			pkgDescr = parser.parse(resource.getInputStream());
+			return pkgDescr;
+		} catch (DroolsParserException e) {
+			e.printStackTrace();
+			throw new RuntimeException(
+					"Could not get the Drools pkgDescription from ruleBase "
+							+ ruleBase, e);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException(
+					"Could not get the Drools pkgDescription from ruleBase "
+							+ ruleBase, e);
+		}
+	}
+	
 
 	/**
 	 * Gets all the properties of a data class (relation) to translate them in
