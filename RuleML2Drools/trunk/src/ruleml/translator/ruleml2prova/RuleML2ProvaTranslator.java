@@ -6,6 +6,9 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -13,44 +16,29 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-//import javax.xml.transform.Source;
-//import javax.xml.transform.Transformer;
-//import javax.xml.transform.TransformerFactory;
-//import javax.xml.transform.stream.StreamResult;
-//import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.transformer.AbstractTransformer;
 
-import ws.prova.kernel2.ProvaList;
-
 /**
- * <code>RuleML2ProvaTranslator</code> translate a Reaction RuleML message into
- * a Prova message The translator uses the specified XSLT.
+ * <code>RuleML2ProvaTranslator</code> translate a Reaction RuleML message into a Prova message The
+ * translator uses the specified XSLT.
  * 
- * If the RuleML message can not be translated, the original RuleML message will
- * be returned
+ * If the RuleML message can not be translated, the original RuleML message will be returned
  * 
  * @author <a href="mailto:adrian.paschke@gmx.de">Adrian Paschke</a>
  * @version
  */
 public class RuleML2ProvaTranslator extends AbstractTransformer {
-
-	protected static transient Log logger = LogFactory
-			.getLog(RuleML2ProvaTranslator.class);
-
+	protected static transient Logger LOGGER = Logger.getLogger(RuleML2ProvaTranslator.class
+			.getName());
 	/**
 	 * Serial version
 	 */
 	private static final long serialVersionUID = -408128452488674866L;
-
-	private TransformerFactory tFactory = TransformerFactory.newInstance();
+	private final TransformerFactory tFactory = TransformerFactory.newInstance();
 	private InputStream is = null;
 	private Source xmlSource = null;
 	private Source xslSource = null;
 	private Transformer transformer = null;
-
 	private String xslt = "rrml2prova.xsl";
 
 	public RuleML2ProvaTranslator() {
@@ -69,20 +57,18 @@ public class RuleML2ProvaTranslator extends AbstractTransformer {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see
-	 * org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
+	 * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
 	 * 
 	 * @returns the input message if the translation fails
 	 */
+	@Override
 	public Object doTransform(Object src, String encoding) {
 		if (src instanceof String) {
 			try {
-
 				InputStream in = null;
 				try {
 					// read model from file on classpath
-					in = Thread.currentThread().getContextClassLoader()
-							.getResourceAsStream(xslt);
+					in = Thread.currentThread().getContextClassLoader().getResourceAsStream(xslt);
 					if (in == null) {
 						// read xslt from file given a relative path
 						in = new FileInputStream(xslt);
@@ -94,59 +80,42 @@ public class RuleML2ProvaTranslator extends AbstractTransformer {
 					in = url.openStream();
 				}
 				if (in == null) {
-					logger.error("Can not load XSLT");
+					LOGGER.log(Level.SEVERE, "Can not load XSLT");
 					return src; // no XSLT translator; return untranslated
-								// message
+					// message
 				}
-
 				xslSource = new StreamSource(in); // XSLT Source
-
 				// Get the XML input
 				String message = src.toString();
-				
-
 				if (message.indexOf("'") != -1) {
-					String query = message.substring(message.indexOf("'"),
-							message.lastIndexOf("'") + 1);
-					String encodedQuery = URLEncoder.encode(
-							query.substring(1, query.length() - 1), "UTF-8");
+					String query = message.substring(message.indexOf("'"), message.lastIndexOf("'") + 1);
+					String encodedQuery = URLEncoder.encode(query.substring(1, query.length() - 1), "UTF-8");
 					message = message.replace(query, encodedQuery);
 				}
-
-				if (message != null && message.length() > 0)
+				if ((message != null) && (message.length() > 0)) {
 					is = new ByteArrayInputStream(message.getBytes());
-
+				}
 				if (is == null) {
-					logger.error("XML input message invalid");
+					LOGGER.log(Level.SEVERE, "XML input message invalid");
 					return src;
 				}
-
-				
 				xmlSource = new StreamSource(is); // XML Source
 				// transform XML message into Prova RMessage
 				transformer = tFactory.newTransformer(xslSource);
-
 				// Perform the transformation.
 				StringWriter provaMessage = new StringWriter();
-				transformer
-						.transform(xmlSource, new StreamResult(provaMessage));
-
+				transformer.transform(xmlSource, new StreamResult(provaMessage));
 				// Extract complex objects from String
 				String output = provaMessage.toString();
-			
-//				ProvaList list = new String2ProvaList().createProvaList(output);
-
+				// ProvaList list = new String2ProvaList().createProvaList(output);
 				return output;
-
 			} catch (Exception e) {
 				e.printStackTrace();
-				logger.error("Error during translation of RuleML message into RMessage");
-				logger.error(e);
+				LOGGER.log(Level.SEVERE, "Error during translation of RuleML message into RMessage");
+				LOGGER.log(Level.SEVERE, Arrays.toString(e.getStackTrace()));
 				return src; // simply return untranslated message
 			}
-
 		}
 		return src; // no translator found; return untranslated message
 	}
-
 }
