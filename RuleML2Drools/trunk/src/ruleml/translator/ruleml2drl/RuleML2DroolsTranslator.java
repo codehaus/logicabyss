@@ -56,17 +56,15 @@ public class RuleML2DroolsTranslator implements Translator {
 		}
 		RuleMLType ruleML = (RuleMLType) o;
 	
-		RuleML2DroolsTranslator translator = new RuleML2DroolsTranslator();
+		currentProcessor.setTranslator(this);
 	
-		translator.currentProcessor.setTranslator(translator);
+		dispatchType(ruleML);
 	
-		translator.dispatchType(ruleML);
-	
-		translator.getDrl().setPackage_("org.ruleml.translator");
-		translator.getDrl().setImports(
+		getDrl().setPackage_("org.ruleml.translator");
+		getDrl().setImports(
 				new String[] { "org.ruleml.translator.TestDataModel.*" });
 	
-		return translator.getDrl().toString();
+		return getDrl().toString();
 	}
 
 	public PartType getCurrentContext() {
