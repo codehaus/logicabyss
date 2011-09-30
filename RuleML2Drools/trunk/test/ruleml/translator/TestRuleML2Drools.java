@@ -59,7 +59,9 @@ public class TestRuleML2Drools  extends TestCase{
 			RuleMLType ruleML = RuleML2DroolsTranslator
 					.readRuleML("ruleml/test_assert.ruleml");
 
-			String drl = RuleML2DroolsTranslator.translate(ruleML);
+			RuleML2DroolsTranslator translator = new RuleML2DroolsTranslator();
+			
+			String drl = translator.translate(ruleML);
 			String expected = "package org.ruleml.translator\n" + 
 					"import org.ruleml.translator.TestDataModel.*;\n" + 
 					"\n" + 
@@ -99,7 +101,8 @@ public class TestRuleML2Drools  extends TestCase{
 			RuleMLType ruleML = RuleML2DroolsTranslator
 					.readRuleML("ruleml/test_retract.ruleml");
 
-			String drl = RuleML2DroolsTranslator.translate(ruleML);
+			RuleML2DroolsTranslator translator = new RuleML2DroolsTranslator();
+			String drl = translator.translate(ruleML);
 			String expected = "package org.ruleml.translator\n" + 
 					"import org.ruleml.translator.TestDataModel.*;\n" + 
 					"\n" + 

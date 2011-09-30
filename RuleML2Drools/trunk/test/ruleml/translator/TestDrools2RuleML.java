@@ -17,8 +17,7 @@ public class TestDrools2RuleML extends TestCase {
 					.readFileAsString("rules/drools/test.drl");
 			Drools2RuleMLTranslator drools2RuleMLTranslator = new Drools2RuleMLTranslator();
 
-			Object result = drools2RuleMLTranslator.doTransform(ruleBase,
-					"UTF-8");
+			Object result = drools2RuleMLTranslator.translate(ruleBase);
 
 			System.out.println(result);
 

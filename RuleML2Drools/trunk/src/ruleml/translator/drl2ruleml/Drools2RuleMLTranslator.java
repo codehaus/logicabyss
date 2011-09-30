@@ -34,26 +34,18 @@ import reactionruleml.DoType;
 import reactionruleml.IfType;
 import reactionruleml.RuleMLType;
 import reactionruleml.RuleType;
+import ruleml.translator.service.Translator;
 
 /**
  * Translator for Drools rules to RuleML
  * 
  * @author Jabarski
  */
-public class Drools2RuleMLTranslator extends AbstractTransformer {
+public class Drools2RuleMLTranslator implements Translator{
 	public static RuleMLBuilder builder = new RuleMLBuilder();
 
-	/**
-	 * The main entry point for the translation
-	 * 
-	 * @param kbase
-	 *          The knowledge base
-	 * @param pkgDescr
-	 *          The output of the drools parser in raw form
-	 * @return Serialized RuleML
-	 */
 	@Override
-	public Object doTransform(Object src, String enc) {
+	public String translate(Object src) {
 		// check the type of the object to transform
 		if (!(src instanceof String)) {
 			throw new IllegalStateException("The object to transform is not of the correct type String, "
