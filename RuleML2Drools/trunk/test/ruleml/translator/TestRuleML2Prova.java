@@ -33,7 +33,7 @@ public class TestRuleML2Prova {
 			final String ruleBase = Util.readFileAsString("rules/drools/test.drl");
 
 			// Drools -> ruleML translation
-			Object ruleML = drools2RuleMLTranslator.doTransform(ruleBase, "UTF-8");
+			Object ruleML = drools2RuleMLTranslator.translate(ruleBase);
 
 			System.out.println(ruleML);
 			
