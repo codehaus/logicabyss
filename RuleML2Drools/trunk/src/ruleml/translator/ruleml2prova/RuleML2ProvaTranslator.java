@@ -42,7 +42,8 @@ public class RuleML2ProvaTranslator implements Translator{
 	private Source xmlSource = null;
 	private Source xslSource = null;
 	private Transformer transformer = null;
-	private String xslt = "rrml2prova.xsl";
+//	private String xslt = "rrml2prova.xsl";
+	private String xslt = "resources/rrml2prova_1.0.xsl";
 
 	public RuleML2ProvaTranslator() {
 		super();
