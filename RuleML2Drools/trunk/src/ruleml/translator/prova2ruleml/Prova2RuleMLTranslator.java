@@ -7,6 +7,9 @@ import java.util.logging.Logger;
 
 import org.mule.transformer.AbstractTransformer;
 
+import ruleml.translator.service.RulesLanguage;
+import ruleml.translator.service.Translator;
+
 import ws.prova.kernel2.ProvaConstant;
 import ws.prova.kernel2.ProvaList;
 import ws.prova.kernel2.ProvaObject;
@@ -20,7 +23,7 @@ import ws.prova.reference2.ProvaConstantImpl;
  * @author <a href="mailto:adrian.paschke@gmx.de">Adrian Paschke</a>
  * @version
  */
-public class Prova2RuleMLTranslator extends AbstractTransformer {
+public class Prova2RuleMLTranslator implements Translator {
 	protected static transient Logger LOGGER = Logger.getLogger(Prova2RuleMLTranslator.class
 			.getName());
 	/**
@@ -141,7 +144,7 @@ public class Prova2RuleMLTranslator extends AbstractTransformer {
 	 * @return returns the input message if the translation fails
 	 */
 	@Override
-	public Object doTransform(Object src, String encoding) {
+	public Object translate(Object src) {
 		if (src instanceof ProvaList) {
 			try {
 				ProvaList pmes = (ProvaList) src;
@@ -232,5 +235,15 @@ public class Prova2RuleMLTranslator extends AbstractTransformer {
 			}
 		}
 		return src;
+	}
+
+	@Override
+	public RulesLanguage getInputLanguage() {
+		return new RulesLanguage("Prova", "1.0");
+	}
+
+	@Override
+	public RulesLanguage getOutputLanguage() {
+		return new RulesLanguage("RuleML", "1.0");
 	}
 }

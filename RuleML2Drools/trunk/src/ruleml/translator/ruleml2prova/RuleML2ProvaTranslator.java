@@ -18,6 +18,9 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.mule.transformer.AbstractTransformer;
 
+import ruleml.translator.service.RulesLanguage;
+import ruleml.translator.service.Translator;
+
 /**
  * <code>RuleML2ProvaTranslator</code> translate a Reaction RuleML message into a Prova message The
  * translator uses the specified XSLT.
@@ -27,7 +30,7 @@ import org.mule.transformer.AbstractTransformer;
  * @author <a href="mailto:adrian.paschke@gmx.de">Adrian Paschke</a>
  * @version
  */
-public class RuleML2ProvaTranslator extends AbstractTransformer {
+public class RuleML2ProvaTranslator implements Translator{
 	protected static transient Logger LOGGER = Logger.getLogger(RuleML2ProvaTranslator.class
 			.getName());
 	/**
@@ -62,7 +65,7 @@ public class RuleML2ProvaTranslator extends AbstractTransformer {
 	 * @returns the input message if the translation fails
 	 */
 	@Override
-	public Object doTransform(Object src, String encoding) {
+	public Object translate(Object src) {
 		if (src instanceof String) {
 			try {
 				InputStream in = null;
@@ -117,5 +120,15 @@ public class RuleML2ProvaTranslator extends AbstractTransformer {
 			}
 		}
 		return src; // no translator found; return untranslated message
+	}
+
+	@Override
+	public RulesLanguage getInputLanguage() {
+		return new RulesLanguage("RuleML","1.0");
+	}
+
+	@Override
+	public RulesLanguage getOutputLanguage() {
+		return new RulesLanguage("Prova","1.0");
 	}
 }

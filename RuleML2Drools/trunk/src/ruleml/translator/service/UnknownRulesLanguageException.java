@@ -9,4 +9,8 @@ package ruleml.translator.service;
  */
 public class UnknownRulesLanguageException extends Exception{
 
+	public UnknownRulesLanguageException(String msg) {
+		super(msg);
+	}
+
 }

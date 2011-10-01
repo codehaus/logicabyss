@@ -15,6 +15,18 @@ public interface Translator {
 	 * @param o The object to be translated.
 	 * @return The translated content.
 	 */
-	public Object translate (Object o);
+	Object translate (Object o);
+	
+	/**
+	 * Returns the input language of the translator.
+	 * @return The input language of the translator.
+	 */
+	RulesLanguage getInputLanguage ();
+	
+	/**
+	 * Returns the output language of the translator.
+	 * @return The output language of the translator.
+	 */
+	RulesLanguage getOutputLanguage ();
 
 }

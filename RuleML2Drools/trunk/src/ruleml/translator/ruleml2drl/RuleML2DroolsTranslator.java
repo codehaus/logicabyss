@@ -1,7 +1,9 @@
 package ruleml.translator.ruleml2drl;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.drools.io.ResourceFactory;
+import org.xml.sax.InputSource;
 
 import reactionruleml.AndInnerType;
 import reactionruleml.AndQueryType;
@@ -31,6 +34,7 @@ import reactionruleml.SlotType;
 import reactionruleml.ThenType;
 import reactionruleml.VarType;
 import ruleml.translator.ruleml2drl.DroolsBuilder.Drl;
+import ruleml.translator.service.RulesLanguage;
 import ruleml.translator.service.Translator;
 
 /**
@@ -50,20 +54,21 @@ public class RuleML2DroolsTranslator implements Translator {
 
 	@Override
 	public String translate(Object o) {
-		if (!(o instanceof RuleMLType)) {
+		if (!(o instanceof String)) {
 			throw new IllegalArgumentException(
-					"The type of the object to translate is not RulemlType");
+					"The type of the object to translate is not String");
 		}
-		RuleMLType ruleML = (RuleMLType) o;
-	
+		String input = (String) o;
+		RuleMLType ruleML = createRuleMLFromXML(input);
+
 		currentProcessor.setTranslator(this);
-	
+
 		dispatchType(ruleML);
-	
+
 		getDrl().setPackage_("org.ruleml.translator");
 		getDrl().setImports(
 				new String[] { "org.ruleml.translator.TestDataModel.*" });
-	
+
 		return getDrl().toString();
 	}
 
@@ -93,10 +98,6 @@ public class RuleML2DroolsTranslator implements Translator {
 
 	public Drl getDrl() {
 		return drl;
-	}
-
-	public void setDrl(Drl drl) {
-		this.drl = drl;
 	}
 
 	// contains the both context state alternatives for Drools source
@@ -225,26 +226,20 @@ public class RuleML2DroolsTranslator implements Translator {
 	}
 
 	/**
-	 * Method to read ruleml 1.0 resource.
+	 * Method to read ruleml 1.0 from xml input.
 	 * 
-	 * @param fileName
-	 *            The name of the resource.
+	 * @param input The name of the resource.
 	 * @return The JAXB parent type for the ruleml 1.0 object model.
 	 */
-	public static RuleMLType readRuleML(String fileName) {
+	private static RuleMLType createRuleMLFromXML(String input) {
 		try {
 			JAXBContext jContext = JAXBContext.newInstance("reactionruleml");
 			Unmarshaller unmarshaller = jContext.createUnmarshaller();
 			JAXBElement<?> unmarshal = (JAXBElement<?>) unmarshaller
-					.unmarshal(ResourceFactory.newClassPathResource(fileName)
-							.getInputStream());
+					.unmarshal(new ByteArrayInputStream(input.getBytes()));
 			RuleMLType ruleMLType = (RuleMLType) unmarshal.getValue();
 			return ruleMLType;
 		} catch (JAXBException e) {
-			throw new RuntimeException(e);
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -304,5 +299,15 @@ public class RuleML2DroolsTranslator implements Translator {
 		} else if (value instanceof JAXBElement<?>) {
 			dispatchType(((JAXBElement<?>) value).getValue());
 		}
+	}
+
+	@Override
+	public RulesLanguage getInputLanguage() {
+		return new RulesLanguage("RuleML", "1.0");
+	}
+
+	@Override
+	public RulesLanguage getOutputLanguage() {
+		return new RulesLanguage("Drools", "1.0");
 	}
 }

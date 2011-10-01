@@ -7,12 +7,13 @@ import java.util.List;
  * 
  * @author jabarski
  */
-public interface RulesTranslator {
+public interface RulesTranslatorService {
 	/**
 	 * Translates the input in RuleML
 	 * @param input The input (rules, queries or facts)
 	 * @param l The language for the input
 	 * @return The result of the translation
+	 * @throws UnknownRulesLanguageException In case of unsupported rules language. 
 	 */
 	String translateToRuleML(String input, RulesLanguage l)
 			throws UnknownRulesLanguageException;
@@ -22,9 +23,19 @@ public interface RulesTranslator {
 	 * language for the input 
 	 * @param input The input (rules, queries or facts)
 	 * @return The result of the translation
+	 * @throws UnknownRulesLanguageException In case of unsupported rules language. 
 	 */
 	String translateToRuleML(String input) throws UnknownRulesLanguageException;
 
+	/**
+	 * Translates the input from RuleML to the output language.
+	 * @param input The RuleML input to be translated.
+	 * @param l The output language. 
+	 * @return The translated output.
+	 * @throws UnknownRulesLanguageException In case of unsupported rules language.
+	 */
+	String translateFromRuleML (String input, RulesLanguage l) throws UnknownRulesLanguageException;
+	
 	/**
 	 * Translates the input in the other language. The translator uses always RuleML
 	 * as a intermediator.
@@ -32,11 +43,11 @@ public interface RulesTranslator {
 	 * @param in The language for the input
 	 * @param out The language for the output
 	 * @return The result of the translation 
+	 * @throws UnknownRulesLanguageException In case of unsupported rules language. 
 	 */
 	String translateToLanguage(String input, RulesLanguage in, RulesLanguage out)
 			throws UnknownRulesLanguageException;
 
-	// Gibt die Information über die aktuellbentutzte RuleML-Version
 	/**
 	 * Gets the information about current version of RuleML that is used for 
 	 * the translations.
@@ -56,4 +67,12 @@ public interface RulesTranslator {
 	 * @return True if the language is supported, false otherwise. 
 	 */
 	boolean supportsLanguage(RulesLanguage l);
+	
+	/**
+	 * Tries to guess the rules language from the input source.
+	 * @param input The rule input that should be analyzed.
+	 * @return The rules language of the input.
+	 * @throws UnknownRulesLanguageException In case of unsupported rules language.  
+	 */
+	RulesLanguage guessLanguage (String input) throws UnknownRulesLanguageException;
 }
