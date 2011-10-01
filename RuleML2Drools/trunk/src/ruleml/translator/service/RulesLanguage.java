@@ -103,4 +103,9 @@ public class RulesLanguage {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "RulesLanguage [name=" + name + ", version=" + version + "]";
+	}
+
 }

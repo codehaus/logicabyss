@@ -6,6 +6,9 @@ import java.util.List;
 
 import ruleml.translator.drl2ruleml.Drools2RuleMLTranslator;
 import ruleml.translator.ruleml2prova.RuleML2ProvaTranslator;
+import ruleml.translator.service.RulesLanguage;
+import ruleml.translator.service.RulesTranslatorService;
+import ruleml.translator.service.TranslatorServiceFactory;
 import ws.prova.api2.ProvaCommunicator;
 import ws.prova.api2.ProvaCommunicatorImpl;
 import ws.prova.exchange.ProvaSolution;
@@ -23,22 +26,29 @@ public class TestEnd2End {
 
 	static void testXSL() {
 
-		RuleML2ProvaTranslator ruleml2ProvaTranslator = new RuleML2ProvaTranslator();
-		ruleml2ProvaTranslator.setXSLT("resources/rrml2prova_1.0.xsl");
+		// RuleML2ProvaTranslator ruleml2ProvaTranslator = new
+		// RuleML2ProvaTranslator();
+		// ruleml2ProvaTranslator.setXSLT("resources/rrml2prova_1.0.xsl");
+		//
+		// Drools2RuleMLTranslator drools2RuleMLTranslator = new
+		// Drools2RuleMLTranslator();
 
-		Drools2RuleMLTranslator drools2RuleMLTranslator = new Drools2RuleMLTranslator();
-		
+		RulesTranslatorService translatorService = TranslatorServiceFactory
+				.createTranslatorService();
+
 		try {
 
-			final String ruleBase = Util.readFileAsString("rules/drools/test.drl");
+			final String input = Util.readFileAsString("rules/drools/test.drl");
 
 			// Drools -> ruleML translation
-			Object ruleML = drools2RuleMLTranslator.translate(ruleBase);
+			String ruleML = translatorService.translateToRuleML(input,
+					new RulesLanguage("Drools", "1.0"));
 
 			System.out.println(ruleML);
-			
+
 			// RuleML -> Prova translation
-			Object result = ruleml2ProvaTranslator.translate(ruleML);
+			Object result = translatorService.translateFromRuleML(ruleML,
+					new RulesLanguage("Prova", "1.0"));
 
 			// execute prova on the rule base
 			test2(result.toString());
@@ -47,9 +57,9 @@ public class TestEnd2End {
 			e.printStackTrace();
 		}
 	}
-	
+
 	static void test2(String ruleBase) {
-		String inputRules = ruleBase+ ":-solve(own(X,Y)).";
+		String inputRules = ruleBase + ":-solve(own(X,Y)).";
 
 		System.out.println(inputRules);
 

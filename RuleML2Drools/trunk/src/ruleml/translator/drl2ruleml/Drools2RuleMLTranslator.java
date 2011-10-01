@@ -34,6 +34,7 @@ import reactionruleml.DoType;
 import reactionruleml.IfType;
 import reactionruleml.RuleMLType;
 import reactionruleml.RuleType;
+import ruleml.translator.service.RulesLanguage;
 import ruleml.translator.service.Translator;
 
 /**
@@ -178,5 +179,15 @@ public class Drools2RuleMLTranslator implements Translator{
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public RulesLanguage getInputLanguage() {
+		return new RulesLanguage("Drools","1.0");
+	}
+
+	@Override
+	public RulesLanguage getOutputLanguage() {
+		return new RulesLanguage("RuleML","1.0");
 	}
 }
