@@ -5,11 +5,8 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.mule.transformer.AbstractTransformer;
-
 import ruleml.translator.service.RulesLanguage;
-import ruleml.translator.service.Translator;
-
+import ruleml.translator.service.RulesTranslator;
 import ws.prova.kernel2.ProvaConstant;
 import ws.prova.kernel2.ProvaList;
 import ws.prova.kernel2.ProvaObject;
@@ -23,7 +20,7 @@ import ws.prova.reference2.ProvaConstantImpl;
  * @author <a href="mailto:adrian.paschke@gmx.de">Adrian Paschke</a>
  * @version
  */
-public class Prova2RuleMLTranslator implements Translator {
+public class Prova2RuleMLTranslator implements RulesTranslator {
 	protected static transient Logger LOGGER = Logger.getLogger(Prova2RuleMLTranslator.class
 			.getName());
 	/**

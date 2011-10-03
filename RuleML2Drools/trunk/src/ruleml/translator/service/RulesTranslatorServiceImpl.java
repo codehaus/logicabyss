@@ -1,5 +1,8 @@
 package ruleml.translator.service;
 
+/**
+ * Prototype implementation of the RulesTranslationService interface.
+ */
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,8 +10,8 @@ import java.util.Map;
 public class RulesTranslatorServiceImpl implements RulesTranslatorService {
 
 	private RulesLanguage ruleML = new RulesLanguage("RuleML", "1.0");
-	private Map<RulesLanguage, Translator> translatorsToRuleML = new HashMap<RulesLanguage, Translator>();
-	private Map<RulesLanguage, Translator> translatorsFromRuleML = new HashMap<RulesLanguage, Translator>();
+	private Map<RulesLanguage, RulesTranslator> translatorsToRuleML = new HashMap<RulesLanguage, RulesTranslator>();
+	private Map<RulesLanguage, RulesTranslator> translatorsFromRuleML = new HashMap<RulesLanguage, RulesTranslator>();
 
 	public RulesTranslatorServiceImpl() {
 
@@ -43,7 +46,7 @@ public class RulesTranslatorServiceImpl implements RulesTranslatorService {
 	}
 
 	@Override
-	public String translateToLanguage(String input, RulesLanguage in,
+	public String translate(String input, RulesLanguage in,
 			RulesLanguage out) throws UnknownRulesLanguageException {
 		String ruleMLOutput = translateToRuleML(input, in);
 		return translateFromRuleML(ruleMLOutput, out);
@@ -56,24 +59,28 @@ public class RulesTranslatorServiceImpl implements RulesTranslatorService {
 
 	@Override
 	public List<RulesLanguage> getSupportedLangugages() {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException ("The operation in not implemented yet");
 	}
 
 	@Override
 	public boolean supportsLanguage(RulesLanguage l) {
-		// TODO Auto-generated method stub
-		return false;
+		throw new UnsupportedOperationException ("The operation in not implemented yet");
 	}
 
 	@Override
 	public RulesLanguage guessLanguage(String input)
 			throws UnknownRulesLanguageException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException ("The operation in not implemented yet");
 	}
 
-	public void addTranslator(Translator t) throws UnknownRulesLanguageException {
+	/**
+	 * Method to add a translator to this service. It will be called from the 
+	 * configurator to initialize the translation service.
+	 * @param t Translator to be added.
+	 * @throws UnknownRulesLanguageException Thrown in case of whrong version
+	 * of the ruleml mediator language.
+	 */
+	public void addTranslator(RulesTranslator t) throws UnknownRulesLanguageException {
 		if (t.getInputLanguage().equals(ruleML)) {
 			translatorsFromRuleML.put(t.getOutputLanguage(),t);
 		} else if(t.getOutputLanguage().equals(ruleML)) {

@@ -35,14 +35,14 @@ import reactionruleml.ThenType;
 import reactionruleml.VarType;
 import ruleml.translator.ruleml2drl.DroolsBuilder.Drl;
 import ruleml.translator.service.RulesLanguage;
-import ruleml.translator.service.Translator;
+import ruleml.translator.service.RulesTranslator;
 
 /**
  * Translator for RuleML intput to Drools DLR-source.
  * 
  * @author Jabarski
  */
-public class RuleML2DroolsTranslator implements Translator {
+public class RuleML2DroolsTranslator implements RulesTranslator {
 
 	private Drl drl = new Drl();
 
