@@ -7,7 +7,7 @@ package ruleml.translator.service;
  * @author jabarski
  *
  */
-public interface Translator {
+public interface RulesTranslator {
 	/**
 	 * The entry point of the translation. This will start translation and
 	 * returns output.

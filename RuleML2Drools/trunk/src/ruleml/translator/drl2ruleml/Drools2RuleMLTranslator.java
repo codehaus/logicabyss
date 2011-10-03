@@ -28,21 +28,20 @@ import org.drools.io.ResourceFactory;
 import org.drools.lang.descr.PackageDescr;
 import org.drools.rule.GroupElement;
 import org.drools.rule.Rule;
-import org.mule.transformer.AbstractTransformer;
 
 import reactionruleml.DoType;
 import reactionruleml.IfType;
 import reactionruleml.RuleMLType;
 import reactionruleml.RuleType;
 import ruleml.translator.service.RulesLanguage;
-import ruleml.translator.service.Translator;
+import ruleml.translator.service.RulesTranslator;
 
 /**
  * Translator for Drools rules to RuleML
  * 
  * @author Jabarski
  */
-public class Drools2RuleMLTranslator implements Translator{
+public class Drools2RuleMLTranslator implements RulesTranslator{
 	public static RuleMLBuilder builder = new RuleMLBuilder();
 
 	@Override

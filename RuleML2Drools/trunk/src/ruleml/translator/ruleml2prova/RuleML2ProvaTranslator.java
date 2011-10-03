@@ -16,10 +16,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.mule.transformer.AbstractTransformer;
-
 import ruleml.translator.service.RulesLanguage;
-import ruleml.translator.service.Translator;
+import ruleml.translator.service.RulesTranslator;
 
 /**
  * <code>RuleML2ProvaTranslator</code> translate a Reaction RuleML message into a Prova message The
@@ -30,7 +28,7 @@ import ruleml.translator.service.Translator;
  * @author <a href="mailto:adrian.paschke@gmx.de">Adrian Paschke</a>
  * @version
  */
-public class RuleML2ProvaTranslator implements Translator{
+public class RuleML2ProvaTranslator implements RulesTranslator{
 	protected static transient Logger LOGGER = Logger.getLogger(RuleML2ProvaTranslator.class
 			.getName());
 	/**
@@ -42,7 +40,6 @@ public class RuleML2ProvaTranslator implements Translator{
 	private Source xmlSource = null;
 	private Source xslSource = null;
 	private Transformer transformer = null;
-//	private String xslt = "rrml2prova.xsl";
 	private String xslt = "resources/rrml2prova_1.0.xsl";
 
 	public RuleML2ProvaTranslator() {
