@@ -1,23 +1,23 @@
 
-x 1) Die Ziele fï¿½r den ï¿½bersetzerservice setzen
+x 1) Die Ziele für den Übersetzerservice setzen
 
-x 2) Entwicklung allgemeiner API fï¿½r den ï¿½bersetzer Service
+x 2) Entwicklung allgemeiner API für den Übersetzer Service
 
-3) Lï¿½sungskonzept
+3) Lösungskonzept
 
 x 4) Implementierung des Services
 
-x 5) Beispiel fï¿½r die Implementierung
+x 5) Beispiel für die Implementierung
 
-6) Erklï¿½rungen fï¿½r die einzelnen Methoden des Services
+6) Erklärungen für die einzelnen Methoden des Services
 
-7) AdapterService fï¿½r HTTP implementieren.
+7) AdapterService für HTTP implementieren.
 
-8) Erklï¿½rung in der Ausarbeitung des Adapters.
+8) Erklärung in der Ausarbeitung des Adapters.
 
-9) GUI fÃ¼rs Beispiel verbessern.
 
-/**********************************  Lï¿½sungskonzept  *****************************************/
+
+/**********************************  Lösungskonzept  *****************************************/
 
 
 
@@ -26,14 +26,14 @@ x 5) Beispiel fï¿½r die Implementierung
 
 /**********************************       Ziele      *****************************************/
 
-ï¿½bersetzer Service:
+Übersetzer Service:
 
- - Anfragen fï¿½r ï¿½bersetzungen zwischen versch. Sprachen bekommen und die ï¿½bersetzung
- zurï¿½ckschicken
+ - Anfragen für Übersetzungen zwischen versch. Sprachen bekommen und die Übersetzung
+ zurückschicken
  
  - Automatisches Erkennen der Sprache des RuleBase
  
- - als Anbinduns-Endpoint zur Verfï¿½gung stellen
+ - als Anbinduns-Endpoint zur Verfügung stellen
  
  - dynamische Plug-In Anbindung von neuen Sprachen  
  
@@ -45,24 +45,24 @@ class Language:
   - Description
 
 class BusinessRulesTranslator
-  	// ï¿½bersetzt den gegebenen input von der Sprache l in RuleML
+  	// Übersetzt den gegebenen input von der Sprache l in RuleML
   - String translateToRuleML (String input, Language l) throws UnknownLanguageException;
  
- 	// ï¿½bersetzt den gegebenen input in RuleML, wobei die Eingangssprache automatisch
+ 	// Übersetzt den gegebenen input in RuleML, wobei die Eingangssprache automatisch
  	// erkannt wird
   - String translateToRuleML (String input) throws UnknownLanguageException;
  
-	// ï¿½bersetzt den gegenbenen input von der Eingangs- in die Ausgangssprache.  Dabei wird
+	// Übersetzt den gegenbenen input von der Eingangs- in die Ausgangssprache.  Dabei wird
 	// immer RuleML als Zwischenstufe benutzt.		
   -  String translateToLanguage (String input, Language in, Language out) throws UnknownLanguageException;
   
-  	// Gibt die Information ï¿½ber die aktuellbentutzte RuleML-Version
+  	// Gibt die Information über die aktuellbentutzte RuleML-Version
   - Language getRuleMLInfo ();
  
- 	// Gibt eine Liste mit den unterstï¿½tzten Sprachen zurï¿½ck
+ 	// Gibt eine Liste mit den unterstützten Sprachen zurück
   - List<Language> getSupportedLangugages ();
   	
-  	// Gibt an ob der ï¿½bersetzter die gegebene Sprache versteht
+  	// Gibt an ob der Übersetzter die gegebene Sprache versteht
   - boolean supportsLanguage (Language l);
 
   
@@ -86,12 +86,12 @@ class BusinessRulesTranslator
 - Parr, Terence, The Definitive ANTLR Reference, Building Domain Specific Languages, 
 	The Pragmatic Bookshelf, Raleigh, North Carolina Dallas, Texas, 2007,ISBN-13: 978-09787392-4-9
 	
-- Kozlenkov, Alex, "Prova Rule Language Version 3.0Userï¿½s Guide", January 2010
+- Kozlenkov, Alex, "Prova Rule Language Version 3.0User’s Guide", January 2010
 
 - Boley, Harold "RIF RuleML Rosetta Ring: Round-Tripping the Dlex Subset of Datalog RuleML and RIF-Core"
 	
-- G. Governatori, J. Hall, and A. Paschke (Eds.): RuleML 2009, LNCS 5858, pp. 29ï¿½42, 2009.
-	ï¿½ Springer-Verlag Berlin Heidelberg 2009
+- G. Governatori, J. Hall, and A. Paschke (Eds.): RuleML 2009, LNCS 5858, pp. 29–42, 2009.
+	© Springer-Verlag Berlin Heidelberg 2009
 	
 - Adrian Paschke, Harold Boley, "Rule Markup Languages and Semantic Web Rule Languages", Chapter I
 
@@ -107,7 +107,7 @@ class BusinessRulesTranslator
 	
 - Adrian Paschke, "Web-based Information Systems, Semantic Web IV -Rules"	 
 
-- Adrian Paschke, "Semantic Web Rules Open Source Prova Projekt", CSW NBI Vorlesung WSï¿½08/08
+- Adrian Paschke, "Semantic Web Rules Open Source Prova Projekt", CSW NBI Vorlesung WS’08/08
 
 - Adrian Paschke, "Rule-Based Service Level Agreements -Knowledge Representation for 
 	Automated e-Contract, SLA and Policy Management", Book ISBN 978-3-88793221-3,
