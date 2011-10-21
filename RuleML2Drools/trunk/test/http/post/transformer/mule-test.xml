@@ -7,11 +7,12 @@
 	version="1.0">
 	<transformers>
 		<transformer name="InTransformer" className="http.post.transformer.InTransformer" />
-		<transformer name="OutTransformer" className="http.post.transformer.OutTransformer" >
+		<transformer name="OutTransformer" className="http.post.transformer.OutTransformer">
 			<properties>
 				<map name="addProperties">
 					<property name="Content-Type" value="text/html" />
 				</map>
+			</properties>
 		</transformer>
 
 	</transformers>
@@ -19,7 +20,8 @@
 	<model name="mule-api-client">
 
 		<mule-descriptor name="TranslatorService"
-			implementation="http.post.transformer.RulesTranslatorServiceHTTPAdapter" singleton="true">
+			implementation="http.post.transformer.RulesTranslatorServiceHTTPAdapter"
+			singleton="true">
 			<inbound-router>
 				<endpoint name="httpEndpoint" address="http://localhost:9988"
 					synchronous="true">
