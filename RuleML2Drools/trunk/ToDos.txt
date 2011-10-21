@@ -1,16 +1,21 @@
 
-
-
-
 x 1) Die Ziele für den Übersetzerservice setzen
 
 x 2) Entwicklung allgemeiner API für den Übersetzer Service
 
 3) Lösungskonzept
 
-4) Implementierung des Services
+x 4) Implementierung des Services
 
-5) Beispiel für die Implementierung
+x 5) Beispiel für die Implementierung
+
+6) Erklärungen für die einzelnen Methoden des Services
+
+7) AdapterService für HTTP implementieren.
+
+8) Erklärung in der Ausarbeitung des Adapters.
+
+
 
 /**********************************  Lösungskonzept  *****************************************/
 
@@ -19,7 +24,7 @@ x 2) Entwicklung allgemeiner API für den Übersetzer Service
 
 
 
-/**********************************  Ziele *****************************************/
+/**********************************       Ziele      *****************************************/
 
 Übersetzer Service:
 
