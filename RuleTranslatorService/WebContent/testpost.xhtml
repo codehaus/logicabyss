@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "DTD/xhtml1-strict.dtd">
+<html xmlns:h="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:f="http://java.sun.com/jsf/core">
+<f:view>
+	<body>
+	<h:commandButton value="Submit" action="http://localhost:9988" />
+		<h:form action="http://localhost:9988" method="POST">
+		<h:panelGrid columns="1" width="50%">
+			<h:column>
+				<h:textarea name="input" cols="50" rows="10" />
+				<h:input type="text" name="languagename" value="**Drools" />
+				<h:input type="text" name="languageversion" value="1.0" />
+				<h:input type="submit" name="lll" value="Submit" />
+			</h:column>
+		</h:panelGrid>
+	</h:form>
+	</body>
+</f:view>
+</html>
