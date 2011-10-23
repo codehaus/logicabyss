@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:a4j="http://richfaces.org/a4j">
+
+<ui:composition template="common.xhtml">
+	<ui:define name="pageTitle">Rules Translation Client</ui:define>
+	<ui:define name="pageHeader">Rules Translation Client</ui:define>
+	<ui:define name="body">
+		<a4j:form>
+			<rich:panel>
+				<h:panelGrid columns="2">
+					<rich:panel style=" width : 400px; height : 200px;">
+						<h:inputTextarea id="rulebase" name="input" cols="50" rows="10"
+							value="#{translationBean.input}" style=" width : 372px;" />
+					</rich:panel>
+					<rich:panel style=" width : 300px; height : 200px;">
+						<h:outputText value="Input language : " style=" width : 50%;" />
+						<rich:comboBox value="#{translationBean.inputLanguage}">
+							<f:selectItems value="#{translationBean.supportedInputLanguages}" />
+						</rich:comboBox>
+					</rich:panel>
+				</h:panelGrid>
+			</rich:panel>
+
+			<rich:panel>
+				<h:panelGrid columns="2">
+					<rich:panel style=" width : 400px; height : 200px;">
+						<h:inputTextarea id="result" name="input" cols="50" rows="10"
+							value="#{translationBean.output}" style=" width : 372px;" />
+					</rich:panel>
+					<rich:panel style=" width : 300px; height : 200px;">
+						<h:outputText value="Output language : " style=" width : 50%;" />
+						<rich:comboBox value="#{translationBean.outputLanguage}">
+							<f:selectItems value="#{translationBean.supportedOutputLanguages}" />
+						</rich:comboBox>
+					</rich:panel>
+				</h:panelGrid>
+			</rich:panel>
+
+			<rich:panel>
+				<a4j:commandButton action="#{translationBean.translate}"
+					value="Translate" reRender="result" style=" width : 112px;" />
+			</rich:panel>
+		</a4j:form>
+	</ui:define>
+</ui:composition>
+
+</html>

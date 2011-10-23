@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="RulesTranslatorWebClient">
+        <wb-resource deploy-path="/" source-path="/WebContent"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/JavaSource"/>
+        <dependent-module archiveName="jibx-run-1.2.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/jibx-run-1.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-spring-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-spring-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jettison-1.0-RC2.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/jettison-1.0-RC2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-transport-http-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-transport-http-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xml-resolver-1.2.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/xml-resolver-1.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="regexp-1.2.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/regexp-1.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-corba-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-corba-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-saaj-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-saaj-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axiom-impl-1.2.12.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axiom-impl-1.2.12.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-adb-codegen-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-adb-codegen-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jaxb-impl-2.1.7.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/jaxb-impl-2.1.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="mex-1.6.1-impl.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/mex-1.6.1-impl.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-xmlbeans-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-xmlbeans-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-codec-1.3.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/commons-codec-1.3.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="woden-impl-commons-1.0M9.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/woden-impl-commons-1.0M9.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-httpclient-3.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/commons-httpclient-3.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="log4j-1.2.15.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/log4j-1.2.15.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="antlr-2.7.7.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/antlr-2.7.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-fastinfoset-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-fastinfoset-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-clustering-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-clustering-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axiom-dom-1.2.12.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axiom-dom-1.2.12.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="woden-impl-dom-1.0M9.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/woden-impl-dom-1.0M9.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jalopy-1.5rc3.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/jalopy-1.5rc3.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-kernel-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-kernel-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="neethi-3.0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/neethi-3.0.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="wstx-asl-3.2.9.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/wstx-asl-3.2.9.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-jaxws-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-jaxws-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="tribes-6.0.16.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/tribes-6.0.16.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="XmlSchema-1.4.7.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/XmlSchema-1.4.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-adb-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-adb-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="juli-6.0.16.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/juli-6.0.16.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="geronimo-ws-metadata_2.0_spec-1.1.2.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/geronimo-ws-metadata_2.0_spec-1.1.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-codegen-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-codegen-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="woden-api-1.0M9.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/woden-api-1.0M9.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="httpcore-4.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/httpcore-4.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="mail-1.4.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/mail-1.4.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jibx-bind-1.2.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/jibx-bind-1.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="geronimo-jta_1.1_spec-1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/geronimo-jta_1.1_spec-1.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-java2wsdl-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-java2wsdl-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jaxws-tools-2.1.3.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/jaxws-tools-2.1.3.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-fileupload-1.2.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/commons-fileupload-1.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-jaxbri-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-jaxbri-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xalan-2.7.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/xalan-2.7.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-mtompolicy-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-mtompolicy-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jaxb-xjc-2.1.7.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/jaxb-xjc-2.1.7.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="geronimo-annotation_1.0_spec-1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/geronimo-annotation_1.0_spec-1.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="geronimo-stax-api_1.0_spec-1.0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/geronimo-stax-api_1.0_spec-1.0.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-metadata-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-metadata-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-transport-local-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-transport-local-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jaxen-1.1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/jaxen-1.1.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-ant-plugin-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-ant-plugin-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jsr311-api-1.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/jsr311-api-1.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="geronimo-saaj_1.3_spec-1.0.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/geronimo-saaj_1.3_spec-1.0.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-io-1.4.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/commons-io-1.4.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="wsdl4j-1.6.2.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/wsdl4j-1.6.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="bcel-5.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/bcel-5.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-jibx-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-jibx-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="geronimo-jaxws_2.2_spec-1.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/geronimo-jaxws_2.2_spec-1.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axiom-api-1.2.12.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axiom-api-1.2.12.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="xmlbeans-2.3.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/xmlbeans-2.3.0.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-soapmonitor-servlet-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-soapmonitor-servlet-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="activation-1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/activation-1.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="jaxb-api-2.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/jaxb-api-2.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="axis2-json-1.6.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/axis2-json-1.6.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-cli-1.2.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/commons-cli-1.2.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="commons-logging-1.1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/win7/Development/axis2-1.6.1/lib/commons-logging-1.1.1.jar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="RulesTranslatorWebClient"/>
+        <property name="java-output-path" value="/RulesTranslatorWebClient/WebContent/WEB-INF/classes"/>
+    </wb-module>
+</project-modules>
