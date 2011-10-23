@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<faces-config version="1.2" xmlns="http://java.sun.com/xml/ns/javaee"
+ xmlns:xi="http://www.w3.org/2001/XInclude"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_1_2.xsd">
+ <managed-bean>
+  <managed-bean-name>translationBean</managed-bean-name>
+  <managed-bean-class>ruleml.translator.web.TranslationBean</managed-bean-class>
+  <managed-bean-scope>request</managed-bean-scope>
+  <managed-property>
+   <property-name>input</property-name>
+   <property-class>java.lang.String</property-class>
+   <value/>
+  </managed-property>
+  <managed-property>
+   <property-name>inputLanguage</property-name>
+   <property-class>java.lang.String</property-class>
+   <value/>
+  </managed-property>
+  <managed-property>
+   <property-name>output</property-name>
+   <property-class>java.lang.String</property-class>
+   <value/>
+  </managed-property>
+  <managed-property>
+   <property-name>outputLanguage</property-name>
+   <property-class>java.lang.String</property-class>
+   <value/>
+  </managed-property>
+ </managed-bean>
+ <application>
+  <view-handler>com.sun.facelets.FaceletViewHandler</view-handler>
+ </application>
+</faces-config>
