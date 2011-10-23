@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mule-configuration PUBLIC "-//MuleSource //DTD mule-configuration XML V1.0//EN"
+                                "http://mule.mulesource.org/dtds/mule-configuration.dtd">
+
+<mule-configuration id="Rule_Responder_Use_Cases"
+	version="1.0">
+	<!-- <transformers> -->
+	<!-- <transformer name="InTransformer" className="http.post.transformer.InTransformer" 
+		/> -->
+	<!-- <transformer name="OutTransformer" className="http.post.transformer.OutTransformer"> -->
+	<!-- <properties> -->
+	<!-- <map name="addProperties"> -->
+	<!-- <property name="Content-Type" value="text/html" /> -->
+	<!-- </map> -->
+	<!-- </properties> -->
+	<!-- </transformer> -->
+<!---->
+	<!-- </transformers> -->
+<!---->
+	<!-- <model name="mule-api-client"> -->
+<!---->
+	<!-- <mule-descriptor name="TranslatorService" -->
+	<!-- implementation="http.post.transformer.RulesTranslatorServiceHTTPAdapter" -->
+	<!-- singleton="true"> -->
+	<!-- <inbound-router> -->
+	<!-- <endpoint name="httpEndpoint" address="http://localhost:9988" -->
+	<!-- synchronous="true"> -->
+	<!-- </endpoint> -->
+	<!-- </inbound-router> -->
+<!---->
+	<!-- <outbound-router> -->
+	<!-- <router className="org.mule.routing.outbound.OutboundPassThroughRouter"> -->
+	<!-- <endpoint address="http://localhost:9988" /> -->
+	<!-- </router> -->
+	<!-- </outbound-router> -->
+	<!-- </mule-descriptor> -->
+<!---->
+	<!-- </model> -->
+
+	<transformers>
+		<transformer name="HttpRequestToSoapRequest"
+			className="org.mule.providers.soap.transformers.HttpRequestToSoapRequest" />
+	</transformers>
+
+	<model name="RulesTranslatorServiceModel">
+		<mule-descriptor name="RulesTranslatorServiceHTTP" implementation="ruleml.translator.service.mule.RulesTranslatorServiceHTTPAdapter" >
+			<inbound-router>
+				<endpoint address="axis:http://localhost:9988"/>
+			</inbound-router>
+		</mule-descriptor>
+		<mule-descriptor name="RulesTranslatorService" implementation="ruleml.translator.service.RulesTranslatorServiceImpl" >
+			<inbound-router>
+				<endpoint address="axis:http://localhost:9989"/>
+			</inbound-router>
+		</mule-descriptor>
+	</model>
+
+</mule-configuration>
