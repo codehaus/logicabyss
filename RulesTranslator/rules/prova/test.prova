@@ -1,0 +1,3 @@
+own("Amazon",P):-
+	buy(P,"Amazon",I),
+	keep(P,I).
