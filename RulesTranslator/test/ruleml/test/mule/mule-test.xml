@@ -44,14 +44,17 @@
 	</transformers>
 
 	<model name="RulesTranslatorServiceModel">
-		<mule-descriptor name="RulesTranslatorServiceHTTP" implementation="ruleml.translator.service.mule.RulesTranslatorServiceHTTPAdapter" >
+		<mule-descriptor name="RulesTranslatorServiceHTTP"
+			implementation="ruleml.translator.service.mule.RulesTranslatorServiceHTTPAdapter"
+			singleton="false">
 			<inbound-router>
-				<endpoint address="axis:http://localhost:9988"/>
+				<endpoint address="axis:http://localhost:9988" synchronous="true" />
 			</inbound-router>
 		</mule-descriptor>
-		<mule-descriptor name="RulesTranslatorService" implementation="ruleml.translator.service.RulesTranslatorServiceImpl" >
+		<mule-descriptor name="RulesTranslatorService"
+			implementation="ruleml.translator.service.RulesTranslatorServiceImpl">
 			<inbound-router>
-				<endpoint address="axis:http://localhost:9989"/>
+				<endpoint address="axis:http://localhost:9989" />
 			</inbound-router>
 		</mule-descriptor>
 	</model>
