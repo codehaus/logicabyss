@@ -11,10 +11,23 @@ x 5) Beispiel für die Implementierung
 
 6) Erklärungen für die einzelnen Methoden des Services
 
-7) AdapterService für HTTP implementieren.
+x 7) AdapterService für HTTP implementieren.
 
 8) Erklärung in der Ausarbeitung des Adapters.
 
+x 9) JSF-GUI bauen und in Tomcat integrieren.
+
+x 10) TranslatorService in RuleResponder integrieren
+
+-----
+
+1) Dynamisches Laden der TranslatorServices erklären
+
+2) HTTPAdapter beschreiben
+
+3) Integration in RuleResponder erklären
+
+4)  
 
 
 /**********************************  Lösungskonzept  *****************************************/

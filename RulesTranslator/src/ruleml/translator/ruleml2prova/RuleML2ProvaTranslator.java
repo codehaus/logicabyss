@@ -2,7 +2,6 @@ package ruleml.translator.ruleml2prova;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URL;
@@ -42,7 +41,7 @@ public class RuleML2ProvaTranslator implements RulesTranslator{
 	private Source xslSource = null;
 	private Transformer transformer = null;
 	private String xslt = "rrml2prova_1.0.xsl";
-
+	
 	public RuleML2ProvaTranslator() {
 		super();
 	}
@@ -55,14 +54,7 @@ public class RuleML2ProvaTranslator implements RulesTranslator{
 	public void setXSLT(String _xslt) {
 		xslt = _xslt;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.mule.transformers.AbstractTransformer#doTransform(java.lang.Object)
-	 * 
-	 * @returns the input message if the translation fails
-	 */
+	
 	@Override
 	public Object translate(Object src) {
 		if (src instanceof String) {
@@ -76,7 +68,6 @@ public class RuleML2ProvaTranslator implements RulesTranslator{
 						in = this.getClass().getClassLoader().getResourceAsStream(xslt);
 						File f = new File("t");
 						System.out.println(f.getAbsolutePath());
-//						in = new FileInputStream(xslt);
 					}
 				} catch (Exception ex) {
 					ex.printStackTrace();

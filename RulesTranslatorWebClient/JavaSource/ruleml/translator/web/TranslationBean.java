@@ -72,7 +72,12 @@ public class TranslationBean {
 	}
 
 	public SelectItem[] getSupportedOutputLanguages() {
-		String[] split = callWS("getSupportedOutputLanguages").split("\n");
+		if (inputLanguage == null) {
+			return new SelectItem[0];
+		}
+		
+		String[] split = callWS("getSupportedOutputLanguages",
+				new String[] { "inLanguage", inputLanguage.split(":")[0], "inLanguageVersion",inputLanguage.split(":")[1]}).split("\n");
 		SelectItem[] supportedInputLanguages = new SelectItem[split.length];
 		for (int i = 0; i < supportedInputLanguages.length; i++) {
 			supportedInputLanguages[i] = new SelectItem(split[i], split[i]);
