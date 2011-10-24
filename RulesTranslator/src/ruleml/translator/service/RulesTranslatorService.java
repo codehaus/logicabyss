@@ -1,6 +1,5 @@
 package ruleml.translator.service;
 
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -10,49 +9,7 @@ import java.util.Set;
  */
 public interface RulesTranslatorService {
 	/**
-	 * Translates the input in RuleML
-	 * 
-	 * @param input
-	 *            The input (rules, queries or facts)
-	 * @param l
-	 *            The language for the input
-	 * @return The result of the translation
-	 * @throws UnknownRulesLanguageException
-	 *             In case of unsupported rules language.
-	 */
-	String translateToRuleML(String input, RulesLanguage l)
-			throws UnknownRulesLanguageException;
-
-	/**
-	 * Translates the input in RuleML. The translator tries to 
-	 * identify the language for the input.
-	 * 
-	 * @param input
-	 *            The input (rules, queries or facts)
-	 * @return The result of the translation
-	 * @throws UnknownRulesLanguageException
-	 *             In case of unsupported rules language.
-	 */
-	String translateToRuleML(String input) throws 
-		UnknownRulesLanguageException;
-
-	/**
-	 * Translates the input from RuleML to the output language.
-	 * 
-	 * @param input
-	 *            The RuleML input to be translated.
-	 * @param l
-	 *            The output language.
-	 * @return The translated output.
-	 * @throws UnknownRulesLanguageException
-	 *             In case of unsupported rules language.
-	 */
-	String translateFromRuleML(String input, RulesLanguage l)
-			throws UnknownRulesLanguageException;
-
-	/**
-	 * Translates the input in the output language. The translator 
-	 * uses always RuleML as a intermediator.
+	 * Translates the input in the output language. 
 	 * 
 	 * @param input
 	 *            The input (rules, queries or facts)
@@ -68,14 +25,6 @@ public interface RulesTranslatorService {
 			throws UnknownRulesLanguageException;
 
 	/**
-	 * Gets the information about current version of RuleML that is used 
-	 * for the translations.
-	 * 
-	 * @return The information about RuleML as an object
-	 */
-	RulesLanguage getRuleMLInfo();
-
-	/**
 	 * Returns list with the business rules languages that are currently
 	 * supported as input languages for the translator framework.
 	 * 
@@ -89,7 +38,7 @@ public interface RulesTranslatorService {
 	 * 
 	 * @return Set with language objects
 	 */
-	Set<RulesLanguage> getSupportedOutputLanguages();
+	Set<RulesLanguage> getSupportedOutputLanguages(RulesLanguage input);
 
 	/**
 	 * Checks if the translator can translate the rulebase from the 
@@ -97,7 +46,7 @@ public interface RulesTranslatorService {
 	 * 
 	 * @return True if the translation is supported, false otherwise.
 	 */
-	boolean supportsTrnslation(RulesLanguage in, RulesLanguage out);
+	boolean supportsTranslation(RulesLanguage in, RulesLanguage out);
 
 	/**
 	 * Tries to guess the rules language from the input source.

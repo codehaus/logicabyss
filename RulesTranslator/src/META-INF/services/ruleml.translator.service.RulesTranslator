@@ -2,3 +2,4 @@ ruleml.translator.drl2ruleml.Drools2RuleMLTranslator
 ruleml.translator.prova2ruleml.Prova2RuleMLTranslator
 ruleml.translator.ruleml2drl.RuleML2DroolsTranslator
 ruleml.translator.ruleml2prova.RuleML2ProvaTranslator
+ruleml.translator.ruleml2prova.RuleML2ProvaTranslator_0_91

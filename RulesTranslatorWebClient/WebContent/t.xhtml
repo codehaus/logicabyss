@@ -19,8 +19,9 @@
 					</rich:panel>
 					<rich:panel style=" width : 300px; height : 200px;">
 						<h:outputText value="Input language : " style=" width : 50%;" />
-						<rich:comboBox value="#{translationBean.inputLanguage}">
+						<rich:comboBox id="comboIn" value="#{translationBean.inputLanguage}">
 							<f:selectItems value="#{translationBean.supportedInputLanguages}" />
+							<a4j:support event="onchange" reRender="comboOut"/>
 						</rich:comboBox>
 					</rich:panel>
 				</h:panelGrid>
@@ -34,7 +35,7 @@
 					</rich:panel>
 					<rich:panel style=" width : 300px; height : 200px;">
 						<h:outputText value="Output language : " style=" width : 50%;" />
-						<rich:comboBox value="#{translationBean.outputLanguage}">
+						<rich:comboBox id="comboOut" value="#{translationBean.outputLanguage}">
 							<f:selectItems value="#{translationBean.supportedOutputLanguages}" />
 						</rich:comboBox>
 					</rich:panel>
