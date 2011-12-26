@@ -129,3 +129,520 @@ class BusinessRulesTranslator
 	
 	
 	
+package ws.prova.mule.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.extras.client.MuleClient;
+import org.mule.transformers.AbstractTransformer;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.transformer.TransformerException;
+
+import ws.prova.RMessage;
+
+/**
+ * <code>RuleML2ProvaTranslator</code> translate a Reaction RuleML message into
+ * a Prova message The translator uses the specified XSLT.
+ * 
+ * If the RuleML message can not be translated, the original RuleML message will
+ * be returned
+ * 
+ * @author <a href="mailto:adrian.paschke@gmx.de">Adrian Paschke</a>
+ * @version
+ */
+public class RuleML2ProvaTranslator extends AbstractTransformer {
+
+	protected static transient Log logger = LogFactory
+			.getLog(RuleML2ProvaTranslator.class);
+
+	/**
+	 * Serial version
+	 */
+	private static final long serialVersionUID = -408128452488674866L;
+
+	public RuleML2ProvaTranslator() {
+		super();
+		this.registerSourceType(Object.class);
+	}
+
+	@Override
+	public Object doTransform(Object src, String encoding)
+			throws TransformerException {
+
+		if (src instanceof String) {
+			try {
+				String output = translate(src.toString());
+
+				// TODO: Decoding of encoded messages to transport e.g. XML
+				// content such as Object Serializations
+				// output = URLDecoder.decode(output, "UTF-8");
+
+				String conv_id = output.substring(output.indexOf(",") + 1,
+						output.indexOf("]"));
+				output = output.replaceFirst(conv_id, "%1");
+				String protocol = output.substring(output.indexOf("],") + 2)
+						.split(",")[0];
+				output = output.replace(protocol + ",", "");
+				String predicate = output.split(",")[4].substring(1);
+				if (predicate.indexOf("=") == -1) {
+					if (predicate.indexOf("[") != -1)
+						predicate = predicate.substring(0,
+								predicate.indexOf("["));
+					output = output.replaceFirst(predicate, "%0");
+				} else {
+					String subst = output.substring(
+							output.indexOf(predicate) - 1, output.length() - 1);
+					predicate = "substitutions";
+					String[] bindings = subst.split("=");
+					String args = "";
+					for (int i = 0; i < bindings.length; i++) {
+						if (bindings[i].indexOf(".") != -1)
+							args = args
+									+ ","
+									+ bindings[i].substring(0,
+											bindings[i].indexOf("."));
+					}
+					output = output.replace(subst, "[%0" + args + "]");
+				}
+
+				List<Object> objects = new ArrayList<Object>();
+				objects.add(predicate);
+				objects.add(conv_id);
+
+				RMessage rmsg = new RMessage(output, objects.toArray());
+				rmsg.setProtocol(protocol.substring(1,
+						protocol.lastIndexOf("\"")));
+				return rmsg;
+			} catch (Exception e) {
+				logger.error("Error during translation of RuleML message into RMessage");
+				logger.error(e);
+				e.printStackTrace();
+				return src; // simply return untranslated message
+			}
+
+		}
+		return src; // no translator found; return untranslated message
+	}
+
+	synchronized private String translate(String input) {
+		try {
+			MuleClient muleClient = new MuleClient();
+			UMOMessage result = muleClient
+					.send("axis:http://localhost:9988/RulesTranslatorServiceHTTP?method=translate",
+							new Object[] { input, "RuleML", "0.91", "Prova",
+									"1.0" }, null);
+			Object payload = result.getPayload();
+
+			return (String) payload;
+		} catch (UMOException e) {
+			e.printStackTrace();
+			return "Error";
+		}
+
+	}
+}
+
+
+
+package ws.prova.mule.impl;
+
+import jade.util.leap.Iterator;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Level;
+import java.util.StringTokenizer;
+import java.net.URLDecoder;
+
+import javax.jms.ObjectMessage;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.components.simple.LogComponent;
+import org.mule.extras.client.MuleClient;
+import org.mule.impl.MuleDescriptor;
+import org.mule.impl.UMODescriptorAware;
+import org.mule.providers.service.TransportFactory;
+import org.mule.umo.UMODescriptor;
+import org.mule.umo.UMOEventContext;
+import org.mule.umo.UMOException;
+import org.mule.umo.UMOMessage;
+import org.mule.umo.model.UMOModel;
+import org.mule.umo.endpoint.UMOEndpoint;
+import org.mule.umo.endpoint.UMOEndpointURI;
+import org.mule.umo.lifecycle.Callable;
+import org.mule.umo.lifecycle.Initialisable;
+import org.mule.umo.lifecycle.InitialisationException;
+import org.mule.umo.lifecycle.RecoverableException;
+import org.mule.umo.manager.UMOManager;
+//import org.activemq.command.ActiveMQTextMessage;
+import org.activemq.message.ActiveMQTextMessage;
+import org.mule.providers.http.HttpMessageAdapter;
+
+import org.mule.impl.endpoint.MuleEndpointURI;
+import org.mule.MuleManager;
+
+import ruleml.translator.service.RulesLanguage;
+
+import ws.prova.Communicator;
+import ws.prova.RMessage;
+import ws.prova.esb.ProvaUMO;
+
+public class ProvaUMOImpl extends LogComponent implements ProvaUMO,
+		Initialisable, Callable, UMODescriptorAware {
+
+	protected static transient Log logger = LogFactory
+			.getLog(ProvaUMOImpl.class);
+
+	private UMODescriptor descriptor;
+
+	private String agentName;
+
+	private Communicator comm;
+	private String currentInstantiation = null;
+
+	protected static ConcurrentMap<String, Communicator> communicators = new ConcurrentHashMap<String, Communicator>();
+
+	/**
+	 * Accept the descriptor in order to get access to its pre-configured
+	 * properties
+	 */
+	public void setDescriptor(UMODescriptor descriptor) {
+		this.descriptor = descriptor;
+	}
+
+	/**
+	 * Called once to set up this Prova message object
+	 */
+	public void initialise() throws InitialisationException,
+			RecoverableException {
+		// logger.info("Initializeing the ProvaUMOImp for "+descriptor.getName());
+		String rulebase = null;
+		try {
+			rulebase = (String) descriptor.getProperties().get("rulebase");
+		} catch (Exception e) {
+			logger.error("rulebase property not set");
+			logger.error(e);
+		}
+		agentName = descriptor.getName();
+		if (communicators.containsKey(agentName)) {
+			comm = communicators.get(agentName);
+			return;
+		}
+
+		// Create an out-of-thread Communicator that will keep the message loop
+		// indefinitely
+		// to make asynchronous queries from other (including main) threads
+		// possible.
+		// "-1" is the timeout for the message queue: in this case, the queue
+		// will exist indefinitely
+		// IMPORTANT NOTE: All communication with an asynchronous Communicator
+		// must go through
+		// consultAsync or sendMsg
+		// Pass "this" as the gateway to ESB from Prova agents to know where to
+		// send messages on protocol "esb"
+		try {
+			comm = new Communicator(agentName, null, new BufferedReader(
+					new InputStreamReader(getClass().getResourceAsStream(
+							rulebase))), -1, Communicator.ASYNC, this);
+			communicators.put(agentName, comm);
+		} catch (Exception ex) {
+			logger.error("Can not initialize Prova communicator");
+			ex.printStackTrace();
+			logger.error(ex);
+		}
+	}
+
+	/**
+	 * Process an inbound Prova RMessage that is assumed to arrive on this
+	 * endpoint
+	 */
+	public Object onCall(UMOEventContext context) throws Exception {
+		// Just logging
+		// super.onCall(context);
+		logger.error("Staring onCall ..." + descriptor.getName());
+		// Extract Prova RMessage
+		UMOMessage inbound = context.getMessage();
+		String temp = inbound.getPayloadAsString();
+		// translate message into execution syntax
+		RMessage rMsg = null;
+		try {
+			if (inbound.getPayload() instanceof ObjectMessage) {
+				Object message = ((ObjectMessage) inbound.getPayload())
+						.getObject();
+				if (message instanceof RMessage)
+					rMsg = (RMessage) message;
+			} else if (inbound.getPayload() instanceof ActiveMQTextMessage) {
+				// translate RuleML message to Prova message
+				// TODO: might be move to config file (as an inbound endpoint
+				// translator)
+				RuleML2ProvaTranslator ruleml2prova = new RuleML2ProvaTranslator();
+				Object message = ruleml2prova
+						.transform(((ActiveMQTextMessage) context.getMessage()
+								.getPayload()).getText());
+				if (message instanceof RMessage)
+					rMsg = (RMessage) message;
+			} else if (inbound.getPayload() instanceof String) {
+				// translate incoming RuleML message to Prova message
+				// TODO: might be move to config file (as an inbound endpoint
+				// translator)
+				RuleML2ProvaTranslator ruleml2prova = new RuleML2ProvaTranslator();
+				String http_message = URLDecoder.decode(
+						inbound.getPayloadAsString(), inbound.getEncoding());
+				if (http_message.indexOf("<") != -1) { // message comes from
+														// HTTP request
+					http_message = http_message.substring(http_message
+							.indexOf("<")); // remove extra HTTP "parameter"
+											// signs
+				}
+				Object message = ruleml2prova.transform(http_message);
+				if (message instanceof RMessage)
+					rMsg = (RMessage) message;
+			} else {
+				Object message = context.getMessage().getPayload();
+				if (message instanceof RMessage)
+					rMsg = (RMessage) message;
+			}
+		} catch (Exception ex) {
+			logger.error("Translation of message into RMessage failed: "
+					+ inbound);
+			logger.error(ex);
+		}
+
+		if (rMsg == null) {
+			// The message is not a RMessage or can not be translated into a
+			// RMessage
+			logger.error("Message has format: " + inbound);
+			// TODO: Failure handling for wrong message formats
+			return null; // do nothing
+		}
+
+		logger.info("Received = " + rMsg);
+
+		// Synchronous processing of queries in order to synchronously return
+		// the results to synchronous requesters (e.g. a Web browser)
+		logger.info("Rulebase : "
+				+ (String) descriptor.getProperties().get("rulebase"));
+		if (inbound.getPayload() instanceof String) {
+			// if not a synchronous query then add message to Prova Agent
+			// Architecture (Prova AA)
+			if (!rMsg.performative().equals("query-sync")) {
+				logger.info("not query-sync");
+				comm.addMsg(rMsg);
+				context.setStopFurtherProcessing(true);
+				return null;
+			} else {
+				logger.info("query-sync ...");
+				int timeout = 30000; // default timeout
+				// register temp. synchronous UMO agent
+
+				// TODO: MAKE IT A LONGER TIMEOUT FOR RULEML2010
+				if (temp.contains("RuleML-2010")) {
+					System.out
+							.println("Timeout increase to 5 minutes for RuleML-2010. Will be reset upon new query.");
+					timeout = 300000;
+				}
+
+				// System.out.println(temp.substring(temp.indexOf("<oid>")+5,temp.indexOf("</oid>")));
+				UMOManager mgr = MuleManager.getInstance();
+				String tmpAgent = rMsg.sender().substring(1,
+						rMsg.sender().length() - 1);
+				logger.info("*** TmpAgent: " + tmpAgent);
+
+				try {
+					/*
+					 * UMOEndpointURI localInboundEndpointUri = new
+					 * MuleEndpointURI("jms://topic:"+tmpAgent); UMOEndpoint
+					 * localInboundEndpoint =
+					 * TransportFactory.createEndpoint(localInboundEndpointUri,
+					 * UMOEndpoint.ENDPOINT_TYPE_RECEIVER);
+					 * localInboundEndpoint.setName(tmpAgent);
+					 * localInboundEndpoint.setSynchronous(false);
+					 * mgr.registerEndpoint(localInboundEndpoint);
+					 */
+					mgr.registerEndpointIdentifier(tmpAgent, "jms://topic:"
+							+ tmpAgent);
+
+					/*
+					 * MuleDescriptor muleDescriptor = new
+					 * MuleDescriptor(tmpAgent);
+					 * muleDescriptor.setImplementation
+					 * ("ws.prova.mule.impl.SyncUMOImpl");
+					 * muleDescriptor.setInboundEndpoint(localInboundEndpoint);
+					 * muleDescriptor.setSingleton(true); UMOModel model =
+					 * mgr.lookupModel
+					 * (mgr.getModels().keySet().iterator().next().toString());
+					 * model.registerComponent(muleDescriptor);
+					 */
+				} catch (Exception e) {
+					logger.error("Can not register synchronous UMO for "
+							+ tmpAgent + ". ");
+					logger.error(e);
+					context.setStopFurtherProcessing(true);
+					return e.toString()
+							+ " This user is already registered. Please use another user name as sender address."; // return
+																													// exception
+				}
+
+				// collect synchronously all answers
+				UMOMessage m = null;
+				String answer = "";
+				int i = 0;
+				MuleClient client = new MuleClient();
+
+				// Add the message to the
+				// asynchronous Prova AA Communicator queue
+				comm.addMsg(rMsg);
+				context.setStopFurtherProcessing(true);
+
+				do {
+					m = client.receive(tmpAgent, timeout); // with timeout
+					logger.info("*** Recived message from temp agent: "
+							+ tmpAgent + ", "
+							+ ((m != null) ? m.getPayload().toString() : m));
+					if (m != null) {
+						// System.out.println("OKJEANT:LKNAT:LANTE:LKTA\n\n\n");
+						String payload = m.getPayload().toString();
+						// System.out.println(" " +
+						// payload.substring((payload.indexOf("<oid>")+5),payload.indexOf("</oid>"))
+						// + " ");
+						// System.out.println("OKJEANT:LKNAT:LANTE:LKTA\n\n\n");
+						// extract message from XML RuleML document
+
+						if (payload.indexOf("<?xml") != -1)
+							payload = payload
+									.substring(payload.indexOf(">") + 1);
+						if (payload.indexOf("<RuleML") != -1)
+							payload = payload
+									.substring(payload.indexOf(">") + 1);
+						if (payload.indexOf("</RuleML>") != -1)
+							payload = payload.replaceFirst("</RuleML>", "");
+						if (payload.indexOf("no_further_answers") != -1) {
+							timeout = 500;
+							continue;
+						}
+						try {
+							payload = URLDecoder.decode(payload, "UTF-8");
+						} catch (Exception e) {
+						}
+						answer = answer + payload + "\r\n\r\n";
+
+						if (i > 0)
+							i--;
+					} else
+						i++;
+				} while (i < 2); // terminate if no further answers are received
+
+				// wrap answer in XML RuleML document
+
+				answer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n"
+						+ "<RuleML "
+						+ "xmlns=\"http://www.ruleml.org/0.91/xsd\" "
+						+ "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+						+ "xsi:schemaLocation=\"http://www.ruleml.org/0.91/xsd "
+						+ "http://ibis.in.tum.de/research/ReactionRuleML/0.2/rr.xsd\">\r\n\r\n"
+						+ answer + "</RuleML>";
+
+				// unregister temp. UMO
+				try {
+					// mgr.unregisterEndpoint(tmpAgent);
+					mgr.unregisterEndpointIdentifier(tmpAgent);
+					// UMOModel model =
+					// mgr.lookupModel(mgr.getModels().keySet().iterator().next().toString());
+					// model.unregisterComponent(model.getComponent(tmpAgent).getDescriptor());
+				} catch (Exception exx) {
+					logger.error("Can not unregister synchronous UMO for "
+							+ tmpAgent);
+					logger.error(exx);
+					return exx.toString();
+				}
+
+				// return answer
+				logger.info("*** Returning the answear: " + answer);
+				return answer;
+			}
+		} else {
+
+			// Asynchronous processing between agents
+			logger.info("Payload is not a string ...");
+			// We are done, everything is asynchronous
+			comm.addMsg(rMsg);
+			context.setStopFurtherProcessing(true);
+			return null;
+		}
+
+	}
+
+	/**
+	 * This method is called when the component is called as a web service
+	 */
+	public void receive(RMessage rMsg) throws Exception {
+		// Add the message as a goal to the asynchronous Prova Communicator
+		// queue
+		logger.info(rMsg);
+		comm.addMsg(rMsg);
+	}
+
+	/**
+	 * Called by Prova when a Prova agent executes sendMsg with protocol
+	 * specified as "esb"
+	 */
+	public void send(String agent, String receiver, RMessage toSend)
+			throws Exception {
+		logger.info("agent=" + agent);
+		logger.info("receiver=" + receiver);
+		logger.info("toSend=" + toSend);
+		logger.info("Instanz=" + descriptor.getName());
+		// translate Prova Message to Reaction RuleML message
+		try {
+			Prova2RuleMLTranslator prova2rrml = new Prova2RuleMLTranslator();
+			Object translatedSend = prova2rrml.transform(toSend);
+			logger.info("Send = " + translatedSend);
+
+			// TODO: work.around bugfix for the bug in MuleClient.receive which
+			// overwrites messages
+			if (receiver.equals("User")) {
+				synchronized (this) {
+					wait(300);
+				}
+			}
+
+			// interchange message
+			MuleClient client = new MuleClient();
+			logger.info("*** Dispatching the message ***   " + "Receiver: "
+					+ receiver + "; Server URI: "
+					+ client.getConfiguration().getServerUrl());
+			client.dispatch(receiver, translatedSend, null);
+		} catch (Exception e) {
+			logger.error(e);
+		}
+
+	}
+
+	public Boolean test() throws Exception {
+		return Boolean.TRUE;
+	}
+
+	<model name="RulesTranslatorServiceModel">
+		<mule-descriptor name="RulesTranslatorServiceHTTP"
+			implementation="ruleml.translator.service.mule.RulesTranslatorServiceHTTPAdapter" singleton="true" >
+			<inbound-router>
+				<endpoint address="axis:http://localhost:9988" synchronous="true" />
+			</inbound-router>
+		</mule-descriptor>
+	</model>
+
+}
+
+
+	
+	
