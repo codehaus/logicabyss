@@ -114,7 +114,7 @@ public class Drools2RuleMLTranslator implements RulesTranslator{
 	 * 
 	 * @return The knowledge base red from file
 	 */
-	private KnowledgeBase readKnowledgeBase(String ruleBase) {
+	public KnowledgeBase readKnowledgeBase(String ruleBase) {
 		final StringReader sr = new StringReader(ruleBase);
 		final Resource resource = ResourceFactory.newReaderResource(sr);
 		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="11.3">
+  <zoom_level>10</zoom_level>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>410</x>
+      <y>210</y>
+      <w>240</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>*DroolsBuilder*
+--
+/Serialisierung von Drools-Elementen/</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>50</x>
+      <y>210</y>
+      <w>260</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>*RuleML2DroolsTranslator*
+--
+dispatchType(Object value) : void
+ 
+--
+/Zentrale Translator-Klasse/
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>50</x>
+      <y>430</y>
+      <w>260</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>*QueryProcessor*
+--
+/Bearbeitung von Queries/</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>50</x>
+      <y>340</y>
+      <w>260</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>*RuleMLGenericProcessor*
+--
+/Bearbeitung vom RuleML-Elementen /
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Class</type>
+    <coordinates>
+      <x>50</x>
+      <y>40</y>
+      <w>260</w>
+      <h>120</h>
+    </coordinates>
+    <panel_attributes>/*RulesTranslator*/
+--
++translate (o : Object) : Object
++getInputLanguage () : RulesLanguage
++getOutputLanguage () : RulesLanguage
+ 
+--
+
+/Generisches Translator-Interface/</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>140</x>
+      <y>130</y>
+      <w>50</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>30;30;30;80</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>280</x>
+      <y>190</y>
+      <w>150</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+&lt;&lt;use&gt;&gt;</panel_attributes>
+    <additional_attributes>130;50;30;50</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>110</x>
+      <y>260</y>
+      <w>112</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+&lt;&lt;use&gt;&gt;</panel_attributes>
+    <additional_attributes>60;80;60;30</additional_attributes>
+  </element>
+  <element>
+    <type>com.umlet.element.Relation</type>
+    <coordinates>
+      <x>140</x>
+      <y>360</y>
+      <w>50</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>30;30;30;70</additional_attributes>
+  </element>
+</diagram>

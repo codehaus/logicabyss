@@ -13,11 +13,12 @@ end
 rule "facts"
 then
 	insert(new Buy("John", "laptop", "Amazon"));
-	insert(new Keep("John","laptop"));
+	insert(new Keep("laptop","John"));
 	insert(new Buy("Mary", "camcorder", "Ebay"));
 	insert(new Keep("Mary","camcorder"));
 	insert(new Buy("John", "phone", "Ebay"));
 end
+
 
 /*
 rule "test2"

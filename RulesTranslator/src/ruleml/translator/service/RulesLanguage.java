@@ -3,7 +3,7 @@ package ruleml.translator.service;
 import java.io.Serializable;
 
 /**
- * This is class that represents a business rules language.
+ * This is a class that represents a business rules language.
  * 
  * @author jabarski
  */
