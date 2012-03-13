@@ -48,7 +48,8 @@ public class TestRuleML2Drools extends TestCase {
 
 		try {
 			// read the ruleml file
-			String input = Util.readFileAsString("rules/ruleml/test_assert.ruleml");
+			String input = Util
+					.readFileAsString("rules/ruleml/test_assert.ruleml");
 
 			RuleML2DroolsTranslator translator = new RuleML2DroolsTranslator();
 
@@ -78,7 +79,56 @@ public class TestRuleML2Drools extends TestCase {
 
 		try {
 			// read the ruleml file
-			String input = Util.readFileAsString("rules/ruleml/test_retract.ruleml");
+			String input = Util
+					.readFileAsString("rules/ruleml/test_retract.ruleml");
+
+			RuleML2DroolsTranslator translator = new RuleML2DroolsTranslator();
+
+			String drl = translator.translate(input);
+			String expected = "package org.ruleml.translator\n"
+					+ "import org.ruleml.translator.TestDataModel.*;\n"
+					+ "\n"
+					+ "\n"
+					+ "rule \"rule1\"\n"
+					+ "	when\n"
+					+ "		Buy(buyer==\"Ti6o\",$Seller:seller,item==\"ThinkPad\")\n"
+					+ "		Person(name==\"Ti6o\",$Var1:age)\n"
+					+ "		$var: Buy(buyer==\"Ti6o\",seller==$Seller,item==\"ThinkPad\")\n"
+					+ "\n"
+					+ "	then\n"
+					+ "		retract ($var);\n"
+					+ "\n"
+					+ "end\n"
+					+ "rule \"rule2\"\n"
+					+ "	when\n"
+					+ "		eval(true)\n"
+					+ "\n"
+					+ "	then\n"
+					+ "		insert( new Own(\"Ti6o\",\"laptop\"));\n"
+					+ "\n"
+					+ "end\n"
+					+ "rule \"rule3\"\n"
+					+ "	when\n"
+					+ "		$var: Buy(buyer==\"Ti6o\",seller==\"Amazon\",item==\"ThinkPad\")\n"
+					+ "\n" + "	then\n" + "		retract ($var);\n" + "\n" + "end\n";
+
+			System.out.println(drl);
+			assertEquals(expected, drl);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void test() {
+		System.out
+				.println("***********************   RuleML -> Drl: test_retract  **************************");
+
+		try {
+			// read the ruleml file
+			String input = Util
+					.readFileAsString("rules/ruleml/test_retract.ruleml");
 
 			RuleML2DroolsTranslator translator = new RuleML2DroolsTranslator();
 
